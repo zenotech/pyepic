@@ -1,2 +1,4 @@
 # pyepic
-Python SDK for EPIC
+[![Documentation Status](https://readthedocs.org/projects/pyepic/badge/?version=latest)](http://pyepic.readthedocs.io/?badge=latest) [![PyPI version fury.io](https://badge.fury.io/py/pyepic.svg)](https://pypi.python.org/pypi/pyepic/)
+
+PyEpic is a simple Python SDK for the EPIC API code. It is designed to allow users to integrate with EPIC for the submission and management of HPC jobs. Documentation available on [read the docs](http://pyepic.readthedocs.io/?badge=latest).
