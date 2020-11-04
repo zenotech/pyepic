@@ -10,4 +10,4 @@ PyEpic can be installed from PyPi.
 pip install pyepic
 ```
 
-Documentation is avaible on [read the docs](http://pyepic.readthedocs.io/?badge=latest).
+Documentation is available on [read the docs](http://pyepic.readthedocs.io/?badge=latest).
