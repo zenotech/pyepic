@@ -1,0 +1,495 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>applications package &mdash; pyepic 0.0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> pyepic
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">applications package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-applications.base">applications.base module</a></li>
+<li><a class="reference internal" href="#module-applications.openfoam">applications.openfoam module</a></li>
+<li><a class="reference internal" href="#module-applications.zcfd">applications.zcfd module</a></li>
+<li><a class="reference internal" href="#module-applications">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">pyepic</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>applications package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/applications.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="applications-package">
+<h1>applications package<a class="headerlink" href="#applications-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-applications.base">
+<span id="applications-base-module"></span><h2>applications.base module<a class="headerlink" href="#module-applications.base" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="applications.base.Config">
+<em class="property">class </em><code class="sig-prename descclassname">applications.base.</code><code class="sig-name descname">Config</code><a class="headerlink" href="#applications.base.Config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt id="applications.base.Config.get_configuration">
+<code class="sig-name descname">get_configuration</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#applications.base.Config.get_configuration" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="applications.base.Distribution">
+<em class="property">class </em><code class="sig-prename descclassname">applications.base.</code><code class="sig-name descname">Distribution</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#applications.base.Distribution" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="py attribute">
+<dt id="applications.base.Distribution.CORE">
+<code class="sig-name descname">CORE</code><em class="property"> = 'core'</em><a class="headerlink" href="#applications.base.Distribution.CORE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="applications.base.Distribution.DEVICE">
+<code class="sig-name descname">DEVICE</code><em class="property"> = 'device'</em><a class="headerlink" href="#applications.base.Distribution.DEVICE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="applications.base.Distribution.NODE">
+<code class="sig-name descname">NODE</code><em class="property"> = 'node'</em><a class="headerlink" href="#applications.base.Distribution.NODE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="applications.base.Distribution.SOCKET">
+<code class="sig-name descname">SOCKET</code><em class="property"> = 'socket'</em><a class="headerlink" href="#applications.base.Distribution.SOCKET" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="applications.base.Job">
+<em class="property">class </em><code class="sig-prename descclassname">applications.base.</code><code class="sig-name descname">Job</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">application_version</span></em>, <em class="sig-param"><span class="n">job_name</span></em>, <em class="sig-param"><span class="n">path</span></em><span class="sig-paren">)</span><a class="headerlink" href="#applications.base.Job" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>docstring</p>
+<dl class="py method">
+<dt id="applications.base.Job.add_step">
+<code class="sig-name descname">add_step</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">job_step</span></em><span class="sig-paren">)</span><a class="headerlink" href="#applications.base.Job.add_step" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="applications.base.Job.get_job_create_spec">
+<code class="sig-name descname">get_job_create_spec</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">queue_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#applications.base.Job.get_job_create_spec" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="applications.base.Job.get_job_spec">
+<code class="sig-name descname">get_job_spec</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#applications.base.Job.get_job_spec" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="applications.base.JobStep">
+<em class="property">class </em><code class="sig-prename descclassname">applications.base.</code><code class="sig-name descname">JobStep</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">execute_step</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#applications.base.JobStep" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>docstring</p>
+<dl class="py method">
+<dt id="applications.base.JobStep.get_task_spec">
+<code class="sig-name descname">get_task_spec</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#applications.base.JobStep.get_task_spec" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="applications.base.Upload">
+<em class="property">class </em><code class="sig-prename descclassname">applications.base.</code><code class="sig-name descname">Upload</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#applications.base.Upload" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="py attribute">
+<dt id="applications.base.Upload.NO">
+<code class="sig-name descname">NO</code><em class="property"> = 'no'</em><a class="headerlink" href="#applications.base.Upload.NO" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="applications.base.Upload.ON_ERROR">
+<code class="sig-name descname">ON_ERROR</code><em class="property"> = 'error'</em><a class="headerlink" href="#applications.base.Upload.ON_ERROR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="applications.base.Upload.YES">
+<code class="sig-name descname">YES</code><em class="property"> = 'yes'</em><a class="headerlink" href="#applications.base.Upload.YES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-applications.openfoam">
+<span id="applications-openfoam-module"></span><h2>applications.openfoam module<a class="headerlink" href="#module-applications.openfoam" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="applications.openfoam.BlockMeshStep">
+<em class="property">class </em><code class="sig-prename descclassname">applications.openfoam.</code><code class="sig-name descname">BlockMeshStep</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#applications.openfoam.BlockMeshStep" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#applications.base.JobStep" title="applications.base.JobStep"><code class="xref py py-class docutils literal notranslate"><span class="pre">applications.base.JobStep</span></code></a></p>
+<p>docstring</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="applications.openfoam.DecomposeParStep">
+<em class="property">class </em><code class="sig-prename descclassname">applications.openfoam.</code><code class="sig-name descname">DecomposeParStep</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#applications.openfoam.DecomposeParStep" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#applications.base.JobStep" title="applications.base.JobStep"><code class="xref py py-class docutils literal notranslate"><span class="pre">applications.base.JobStep</span></code></a></p>
+<p>docstring</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="applications.openfoam.OpenFoamJob">
+<em class="property">class </em><code class="sig-prename descclassname">applications.openfoam.</code><code class="sig-name descname">OpenFoamJob</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">foam_version_id</span></em>, <em class="sig-param"><span class="n">job_name</span></em>, <em class="sig-param"><span class="n">data_path</span></em><span class="sig-paren">)</span><a class="headerlink" href="#applications.openfoam.OpenFoamJob" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#applications.base.Job" title="applications.base.Job"><code class="xref py py-class docutils literal notranslate"><span class="pre">applications.base.Job</span></code></a></p>
+<p>A helper class for submitting an OpenFOAM job to EPIC.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>foam_version_id</strong> (<em>int</em>) – The ID of the BatchApplicationVersion of OpenFOAM to use</p></li>
+<li><p><strong>job_name</strong> (<em>str</em>) – The name to give the job in EPIC</p></li>
+<li><p><strong>data_path</strong> (<em>str</em>) – The epic data path to the OpenFOAM case directory</p></li>
+</ul>
+</dd>
+<dt class="field-even">Variables</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>blockMesh</strong> – initial value</p></li>
+<li><p><strong>decomposePar</strong> – initial value</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="applications.openfoam.OpenFoamJob.get_applications_options">
+<code class="sig-name descname">get_applications_options</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#applications.openfoam.OpenFoamJob.get_applications_options" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="applications.openfoam.OpenFoamJob.get_job_create_spec">
+<code class="sig-name descname">get_job_create_spec</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">queue_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#applications.openfoam.OpenFoamJob.get_job_create_spec" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="applications.openfoam.Reconstruct">
+<em class="property">class </em><code class="sig-prename descclassname">applications.openfoam.</code><code class="sig-name descname">Reconstruct</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#applications.openfoam.Reconstruct" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="py attribute">
+<dt id="applications.openfoam.Reconstruct.ALL">
+<code class="sig-name descname">ALL</code><em class="property"> = 'all'</em><a class="headerlink" href="#applications.openfoam.Reconstruct.ALL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="applications.openfoam.Reconstruct.LATEST">
+<code class="sig-name descname">LATEST</code><em class="property"> = 'latest'</em><a class="headerlink" href="#applications.openfoam.Reconstruct.LATEST" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="applications.openfoam.Reconstruct.TIME">
+<code class="sig-name descname">TIME</code><em class="property"> = 'time'</em><a class="headerlink" href="#applications.openfoam.Reconstruct.TIME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="applications.openfoam.ReconstructParStep">
+<em class="property">class </em><code class="sig-prename descclassname">applications.openfoam.</code><code class="sig-name descname">ReconstructParStep</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#applications.openfoam.ReconstructParStep" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#applications.base.JobStep" title="applications.base.JobStep"><code class="xref py py-class docutils literal notranslate"><span class="pre">applications.base.JobStep</span></code></a></p>
+<p>docstring</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="applications.openfoam.SolverStep">
+<em class="property">class </em><code class="sig-prename descclassname">applications.openfoam.</code><code class="sig-name descname">SolverStep</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#applications.openfoam.SolverStep" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#applications.base.JobStep" title="applications.base.JobStep"><code class="xref py py-class docutils literal notranslate"><span class="pre">applications.base.JobStep</span></code></a></p>
+<p>docstring</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="applications.openfoam.StartFrom">
+<em class="property">class </em><code class="sig-prename descclassname">applications.openfoam.</code><code class="sig-name descname">StartFrom</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#applications.openfoam.StartFrom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="py attribute">
+<dt id="applications.openfoam.StartFrom.FIRST">
+<code class="sig-name descname">FIRST</code><em class="property"> = 'firstTime'</em><a class="headerlink" href="#applications.openfoam.StartFrom.FIRST" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="applications.openfoam.StartFrom.LATEST">
+<code class="sig-name descname">LATEST</code><em class="property"> = 'latestTime'</em><a class="headerlink" href="#applications.openfoam.StartFrom.LATEST" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="applications.openfoam.StartFrom.START">
+<code class="sig-name descname">START</code><em class="property"> = 'startTime'</em><a class="headerlink" href="#applications.openfoam.StartFrom.START" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="applications.openfoam.StopAt">
+<em class="property">class </em><code class="sig-prename descclassname">applications.openfoam.</code><code class="sig-name descname">StopAt</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#applications.openfoam.StopAt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="py attribute">
+<dt id="applications.openfoam.StopAt.END_TIME">
+<code class="sig-name descname">END_TIME</code><em class="property"> = 'endTime'</em><a class="headerlink" href="#applications.openfoam.StopAt.END_TIME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="applications.openfoam.StopAt.NEXT_WRITE">
+<code class="sig-name descname">NEXT_WRITE</code><em class="property"> = 'nextWrite'</em><a class="headerlink" href="#applications.openfoam.StopAt.NEXT_WRITE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="applications.openfoam.StopAt.NO_WRITE_NOW">
+<code class="sig-name descname">NO_WRITE_NOW</code><em class="property"> = 'noWriteNow'</em><a class="headerlink" href="#applications.openfoam.StopAt.NO_WRITE_NOW" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="applications.openfoam.StopAt.WRITE_NOW">
+<code class="sig-name descname">WRITE_NOW</code><em class="property"> = 'writeNow'</em><a class="headerlink" href="#applications.openfoam.StopAt.WRITE_NOW" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-applications.zcfd">
+<span id="applications-zcfd-module"></span><h2>applications.zcfd module<a class="headerlink" href="#module-applications.zcfd" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="applications.zcfd.Reconstruct">
+<em class="property">class </em><code class="sig-prename descclassname">applications.zcfd.</code><code class="sig-name descname">Reconstruct</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#applications.zcfd.Reconstruct" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="py attribute">
+<dt id="applications.zcfd.Reconstruct.ALL">
+<code class="sig-name descname">ALL</code><em class="property"> = 'all'</em><a class="headerlink" href="#applications.zcfd.Reconstruct.ALL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="applications.zcfd.Reconstruct.LATEST">
+<code class="sig-name descname">LATEST</code><em class="property"> = 'latest'</em><a class="headerlink" href="#applications.zcfd.Reconstruct.LATEST" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="applications.zcfd.Reconstruct.TIME">
+<code class="sig-name descname">TIME</code><em class="property"> = 'time'</em><a class="headerlink" href="#applications.zcfd.Reconstruct.TIME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="applications.zcfd.ZCFDJob">
+<em class="property">class </em><code class="sig-prename descclassname">applications.zcfd.</code><code class="sig-name descname">ZCFDJob</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">foam_version_id</span></em>, <em class="sig-param"><span class="n">job_name</span></em>, <em class="sig-param"><span class="n">data_path</span></em><span class="sig-paren">)</span><a class="headerlink" href="#applications.zcfd.ZCFDJob" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#applications.base.Job" title="applications.base.Job"><code class="xref py py-class docutils literal notranslate"><span class="pre">applications.base.Job</span></code></a></p>
+<p>An ZCFD job object in EPIC</p>
+<dl class="py method">
+<dt id="applications.zcfd.ZCFDJob.get_applications_options">
+<code class="sig-name descname">get_applications_options</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#applications.zcfd.ZCFDJob.get_applications_options" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="applications.zcfd.ZCFDJob.get_job_create_spec">
+<code class="sig-name descname">get_job_create_spec</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">queue_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#applications.zcfd.ZCFDJob.get_job_create_spec" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="applications.zcfd.ZCFDStep">
+<em class="property">class </em><code class="sig-prename descclassname">applications.zcfd.</code><code class="sig-name descname">ZCFDStep</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#applications.zcfd.ZCFDStep" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#applications.base.JobStep" title="applications.base.JobStep"><code class="xref py py-class docutils literal notranslate"><span class="pre">applications.base.JobStep</span></code></a></p>
+<p>docstring</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-applications">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-applications" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Zenotech
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,9 @@
+pyepic
+======
+
+.. toctree::
+   :maxdepth: 4
+
+   applications
+   client
+   foam_example

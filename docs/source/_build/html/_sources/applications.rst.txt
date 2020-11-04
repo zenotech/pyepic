@@ -1,0 +1,37 @@
+applications package
+====================
+
+Submodules
+----------
+
+applications.base module
+------------------------
+
+.. automodule:: applications.base
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+applications.openfoam module
+----------------------------
+
+.. automodule:: applications.openfoam
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+applications.zcfd module
+------------------------
+
+.. automodule:: applications.zcfd
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: applications
+   :members:
+   :undoc-members:
+   :show-inheritance:

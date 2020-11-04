@@ -1,0 +1,415 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>client package &mdash; pyepic 0.0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> pyepic
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">client package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-client.client">client.client module</a></li>
+<li><a class="reference internal" href="#module-client">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">pyepic</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>client package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/client.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="client-package">
+<h1>client package<a class="headerlink" href="#client-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-client.client">
+<span id="client-client-module"></span><h2>client.client module<a class="headerlink" href="#module-client.client" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="client.client.APIListResponse">
+<em class="property">class </em><code class="sig-prename descclassname">client.client.</code><code class="sig-name descname">APIListResponse</code><a class="headerlink" href="#client.client.APIListResponse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>An abstract representation of the response from an EPIC API list request</p>
+<dl class="py method">
+<dt id="client.client.APIListResponse.count">
+<em class="property">property </em><code class="sig-name descname">count</code><a class="headerlink" href="#client.client.APIListResponse.count" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Number of results returned</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="client.client.APIListResponse.next">
+<em class="property">property </em><code class="sig-name descname">next</code><a class="headerlink" href="#client.client.APIListResponse.next" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return next</dt>
+<dd class="field-odd"><p>The uri to get the next set of responses</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="client.client.APIListResponse.previous">
+<em class="property">property </em><code class="sig-name descname">previous</code><a class="headerlink" href="#client.client.APIListResponse.previous" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return next</dt>
+<dd class="field-odd"><p>The uri to get the previous set of responses</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="client.client.APIListResponse.results">
+<em class="property">property </em><code class="sig-name descname">results</code><a class="headerlink" href="#client.client.APIListResponse.results" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A list of the repsonse objects for request</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="client.client.EPICClient">
+<em class="property">class </em><code class="sig-prename descclassname">client.client.</code><code class="sig-name descname">EPICClient</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">connection_token</span></em>, <em class="sig-param"><span class="n">connection_url</span><span class="o">=</span><span class="default_value">'https://epic.zenotech.com/api/v2'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#client.client.EPICClient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A wrapper class around the epiccore API.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>connection_token</strong> (<em>str</em>) – Your EPIC API authentication token</p></li>
+<li><p><strong>connection_url</strong> (<em>str</em><em>, </em><em>optional</em>) – The API URL for EPIC, defaults to “<a class="reference external" href="https://epic.zenotech.com/api/v2">https://epic.zenotech.com/api/v2</a>”</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="client.client.EPICClient.cancel_job">
+<code class="sig-name descname">cancel_job</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">job_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#client.client.EPICClient.cancel_job" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cancel job with ID job_id</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>job_id</strong> (<em>int</em>) – The ID of the job to cancel</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="client.client.EPICClient.get_job_details">
+<code class="sig-name descname">get_job_details</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">job_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#client.client.EPICClient.get_job_details" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get details of job with ID job_id</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>job_id</strong> (<em>int</em>) – The ID of the job to fetch details on</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A Job instance</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>class:<cite>epiccore.models.Job</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="client.client.EPICClient.get_job_quote">
+<code class="sig-name descname">get_job_quote</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">job_spec</span></em><span class="sig-paren">)</span><a class="headerlink" href="#client.client.EPICClient.get_job_quote" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a Quote for running a series of tasks on EPIC.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>job_spec</strong> (class:<cite>epiccore.models.JobSpec</cite>) – The EPIC job specification</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A quote giving the price for the job on the available HPC queues</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>class:<cite>epiccore.models.JobQuote</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="client.client.EPICClient.list_applications">
+<code class="sig-name descname">list_applications</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">limit</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">offset</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">product_name</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#client.client.EPICClient.list_applications" title="Permalink to this definition">¶</a></dt>
+<dd><p>List the applications available in EPIC</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>limit</strong> (<em>int</em>) – Number of results to return per request, defaults to 10</p></li>
+<li><p><strong>offset</strong> (<em>int</em>) – The initial index from which to return the results, defaults to 0</p></li>
+<li><p><strong>product_name</strong> (<em>str</em><em>, </em><em>optional</em>) – Filter clusters by application name.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Response with results of returned <code class="xref py py-class docutils literal notranslate"><span class="pre">epiccore.models.BatchApplicationDetails</span></code> objects</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>class:<cite>APIListResponse</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="client.client.EPICClient.list_clusters">
+<code class="sig-name descname">list_clusters</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">limit</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">offset</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">cluster_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">application_id</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#client.client.EPICClient.list_clusters" title="Permalink to this definition">¶</a></dt>
+<dd><p>List the clusters available in EPIC</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>limit</strong> (<em>int</em>) – Number of results to return per request, defaults to 10</p></li>
+<li><p><strong>offset</strong> (<em>int</em>) – The initial index from which to return the results, defaults to 0</p></li>
+<li><p><strong>cluster_name</strong> (<em>str</em><em>, </em><em>optional</em>) – Filter clusters by cluster name.</p></li>
+<li><p><strong>application_id</strong> (<em>int</em><em>, </em><em>optional</em>) – Filter clusters by those with application application_id available.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Response with results of returned <code class="xref py py-class docutils literal notranslate"><span class="pre">epiccore.models.BatchQueueDetails</span></code> objects</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>class:<cite>APIListResponse</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="client.client.EPICClient.list_jobs">
+<code class="sig-name descname">list_jobs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">limit</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">offset</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#client.client.EPICClient.list_jobs" title="Permalink to this definition">¶</a></dt>
+<dd><p>List all of the jobs in EPIC.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>limit</strong> (<em>int</em>) – Number of results to return per request, defaults to 10</p></li>
+<li><p><strong>offset</strong> (<em>int</em>) – The initial index from which to return the results, defaults to 0</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Response with results of returned <code class="xref py py-class docutils literal notranslate"><span class="pre">epiccore.models.Job</span></code> objects</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>class:<cite>APIListResponse</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="client.client.EPICClient.submit_job">
+<code class="sig-name descname">submit_job</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">job_array_spec</span></em><span class="sig-paren">)</span><a class="headerlink" href="#client.client.EPICClient.submit_job" title="Permalink to this definition">¶</a></dt>
+<dd><p>Submit new job in EPIC as described by job_array_spec.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>job_array_spec</strong> (class:<cite>epiccore.models.JobArraySpec</cite>) – The EPIC job specification</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The newly created job instance</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>class:<cite>epiccore.models.Job</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-client">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-client" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Zenotech
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,7 @@
+foam\_example module
+====================
+
+.. automodule:: foam_example
+   :members:
+   :undoc-members:
+   :show-inheritance:

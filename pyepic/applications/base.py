@@ -1,0 +1,185 @@
+from enum import Enum
+
+from epiccore.models import (
+    JobQuote,
+    JobSpec,
+    JobTaskSpec,
+    JobArraySpec,
+    JobConfiguration,
+    JobDataBinding,
+    JobClusterSpec,
+    DataSpec
+)
+
+class Distribution (Enum):
+    """ How should the partitions/processes or tasks be distrubuted on the remote cluster, 1 per CORE/SOCKET/NODE or DEVICE
+    """
+    CORE = 'core'
+    SOCKET = 'socket'
+    NODE = 'node'
+    DEVICE = 'device'
+
+
+class Upload (Enum):
+    """ Should excluded files be uploaded? Yes, No or only when the job finishes in an error state.
+    """
+    YES = 'yes'
+    NO = 'no'
+    ON_ERROR = 'error'
+
+
+class JobStep(object):
+    """ A Step within an EPIC Job
+
+            :param execute_step: Enable this step as part of this job
+            :type execute_step: int
+
+            :var step_name: Name of step, this is application specific
+            :vartype step_name: str
+            :var execute: Should this step execute when the job is submitted
+            :vartype execute: bool
+            :var partitions: How many partitions/processes make up this step
+            :vartype partitions: int
+            :var task_distribution: How are the partitions distributed to the hardware
+            :vartype task_distribution: :class:`Distribution`
+            :var runtime: The maximum runtime of this step in hours
+            :vartype runtime: int
+            :var run_if_previous_step_fails: Should this step execute if the previous step fails
+            :vartype run_if_previous_step_fails: bool
+            :var hyperthreading: Does this step count hyperthreaded cores as individual CPUs?
+            :vartype hyperthreading: bool
+    """
+
+    def __init__(self, execute_step=True):
+        self.step_name = None
+        self.execute = execute_step
+        self.partitions = 1
+        self.task_distribution = Distribution.CORE
+        self.runtime = 1
+        self.run_if_previous_step_fails = True
+        self.hyperthreading = True
+
+    def get_task_spec(self):
+        """Get a JobTaskSpec for this job step
+
+            :return: Job Task Specification
+            :rtype: :class:`epiccore.models.JobTaskSpec`
+        """
+        spec = JobTaskSpec(
+            reference=self.step_name,
+            partitions=self.partitions,
+            runtime=self.runtime,
+            task_distribution=self.task_distribution.value,
+            hyperthreading=self.hyperthreading,
+        )
+        return spec
+  
+class Config(object):
+    """ The Job Configuration
+
+            :var overwrite_existing: Should data created on the remote cluster overwrite older data that exists in the epic data store
+            :vartype overwrite_existing: bool
+            :var upload: Which job states should trigger a data upload 
+            :vartype upload: list
+            :var data_sync_interval: How frequently should the data be periodically uploaded while the job is still running, set to 0 to disable. 
+            :vartype data_sync_interval: int
+            :var project_id: ID of the EPIC project to run this job in
+            :vartype project_id: int, optional
+    """
+    def __init__(self):
+        self.overwrite_existing = True
+        self.upload = ["failure", "complete", "cancel"]
+        self.data_sync_interval = 0
+        self.project_id = None
+
+    def get_configuration(self):
+        """Get a JobConfiguration for this job
+            :return: Job Configuration
+            :rtype: class:`epiccore.models.JobConfiguration`
+        """
+        return JobConfiguration(
+            upload=self.upload,
+            overwrite_existing=self.overwrite_existing,
+            data_sync_interval=self.data_sync_interval,
+        )
+
+class Job(object):
+    """ An EPIC Job Definition
+
+            :param application_version: The ID of the BatchApplicationVersion that this job will user
+            :type application_version: int
+            :param job_name: A user friendly name for the job 
+            :type job_name: str
+            :param path: The path to the root of the OpenFOAM job, formed as an epic url (e.g. "epic://path_to/data")
+            :type path: str
+
+            :var job_name: A user friendly name for the job 
+            :vartype job_name: str
+            :var path: The path to the root of the OpenFOAM job, formed as an epic url (e.g. "epic://path_to/data")
+            :vartype path: str
+            :var config: The Job configuration options object
+            :vartype config: :class:`Config`
+            :var steps: The job steps that make up this job
+            :vartype steps: list
+    """
+
+    def __init__(self, application_version, job_name, path):
+        self.application_version = application_version
+        self.job_name = job_name
+        self.path = path
+        self.config = Config()
+        self.steps = []
+
+    def add_step(self, job_step):
+        """ Add a new step to this job
+
+            :param job_step: The step to append to this job
+            :type job_step: :class:`JobStep`
+        """
+        self.steps.append(job_step)
+
+    def get_job_spec(self):
+        """Get a JobSpec for this job
+
+            :return: Job Specification
+            :rtype: class:`epiccore.models.JobSpec`
+        """
+        tasks = []
+        for step in self.steps:
+            if step.execute:
+                tasks.append(step.get_task_spec())
+        jobspec = JobSpec(
+            application_version=self.application_version,
+            project=self.config.project_id,
+            tasks=tasks,
+        ) 
+        return jobspec
+
+    def get_job_create_spec(self, queue_id):
+        """Get a JobArraySpec for this job. The JobArraySpec can be used to submit the job to EPIC via the client.
+
+            :param queue_id: The ID of the EPIC batch queue to submit to
+            :type queue_id: int
+
+            :return: Job ArraySpecification
+            :rtype: class:`epiccore.models.JobArraySpec`
+        """
+        spec = JobArraySpec(
+            name=self.job_name,
+            config=self.config.get_configuration(),
+            jobs=[
+                JobDataBinding(
+                    name=self.job_name,
+                    spec=self.get_job_spec(),
+                    app_options={},
+                    cluster=JobClusterSpec(
+                        queue=queue_id,
+                    ),
+                    input_data=DataSpec(
+                        path=self.path,
+                    ),
+                ),
+            ],
+        )  
+        return spec
+
