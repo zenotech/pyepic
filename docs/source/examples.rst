@@ -13,7 +13,7 @@ To initialise the client simply import EPICClient and then create a client insta
 
     from pyepic.client import EPICClient
     
-    client = EPICClient("your_api_token_goes_here)
+    client = EPICClient("your_api_token_goes_here")
 
 
 Listing Applications
@@ -385,6 +385,10 @@ submit to and the path to the root of the openfoam case. The data for this case 
     # Create the job using application version ID 12
     openfoam_job = OpenFoamJob(12, "job_name", "epic://my_data/foam/")
 
+    # Configure the solver to run on 24 paritions for a maximum of 12 hours
+    openfoam_job.solver.partitions = 24
+    openfoam_job.solver.runtime = 12
+
     # Create the specification for submission to queue ID 3
     job_spec = openfoam_job.get_job_create_spec(3)
 
@@ -396,5 +400,28 @@ The submit_job method will return a job object. The job_id can be extraced from 
 
 zCFD
 ====
+To create and submit an zCFD job you can use the :class:`pyepic.applications.zcfd.ZCFDJob` class. 
+Prior to creating the job you need to know the ID over the application version you wish to use, the id of the batch queue you want to 
+submit to and the path to the root of the zcfd case. The data for this case is assumed to have already been uploaded to your EPIC data store.
 
-TBC
+
+.. code-block:: python
+
+    import pyepic
+
+    from pyepic.client import EPICClient
+    from pyepic.applications.zcfd import ZCFDJob
+
+    client = EPICClient("your_api_token_goes_here")
+
+    # Create a zCFD job using application version id 3
+    zcfd_job = ZCFDJob(3, "zcfd_case", "epic://zcfd/", "fv.py", "box.hdf5", cycles=1000, restart=False, partitions=24)
+
+    # Configure the solver to run for a maximum of 12 hours
+    zcfd_job.zcfd.runtime = 12
+
+    # Create the specification for submission to queue ID 3
+    job_spec = zcfd_job.get_job_create_spec(3)
+
+    # Submit the job
+    job = client.submit_job(job_spec)

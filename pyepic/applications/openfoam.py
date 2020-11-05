@@ -28,7 +28,7 @@ class BlockMeshStep(JobStep):
 
 
     def __init__(self, *args, **kwargs):
-        super(BlockMeshStep, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.step_name = 'blockMesh'
 
 
@@ -37,7 +37,7 @@ class DecomposeParStep(JobStep):
     """
 
     def __init__(self, *args, **kwargs):
-        super(DecomposeParStep, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.step_name = 'decomposePar'
 
 
@@ -57,7 +57,7 @@ class SolverStep(JobStep):
     """
 
     def __init__(self, *args, **kwargs):
-        super(SolverStep, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.run_if_previous_step_fails = False
         self.step_name = 'solver'
         self.stopAt = StopAt.END_TIME
@@ -78,7 +78,7 @@ class ReconstructParStep(JobStep):
     """
 
     def __init__(self, *args, **kwargs):
-        super(ReconstructParStep, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.run_if_previous_step_fails = True
         self.step_name = 'reconstructPar'
         self.reconstruct_option = Reconstruct.ALL
@@ -111,7 +111,7 @@ class OpenFoamJob(Job):
 
     def __init__(self, foam_version_id, job_name, data_path):
 
-        super(OpenFoamJob, self).__init__(foam_version_id, job_name, data_path)
+        super().__init__(foam_version_id, job_name, data_path)
         self.blockMesh = BlockMeshStep(execute_step=False)
         self.decomposePar = DecomposeParStep(execute_step=True)
         self.solver = SolverStep(execute_step=True)
