@@ -1,5 +1,5 @@
 import epiccore
-from epiccore.api import job_api, catalog_api
+from epiccore.api import job_api, catalog_api, jobstep_api
 
 
 class APIListResponse(object):
@@ -95,6 +95,22 @@ class EPICClient(object):
             instance = job_api.JobApi(api_client)
             return instance.job_list(limit=limit, offset=offset)
 
+    def list_job_steps(self, parent_job=None, limit=10, offset=0):
+        """List all of the job steps in EPIC. 
+
+            :param parent_job: The ID of the parent job to list the steps for
+            :type parent_job: int, optional
+            :param limit: Number of results to return per request, defaults to 10
+            :type limit: int
+            :param offset: The initial index from which to return the results, defaults to 0
+            :type offset: int
+            :return: Response with results of returned :class:`epiccore.models.JobStep` objects
+            :rtype: class:`APIListResponse`
+        """
+        with epiccore.ApiClient(self.configuration) as api_client:
+            instance = jobstep_api.JobstepApi(api_client)
+            return instance.jobstep_list(parent_job=parent_job, limit=limit, offset=offset)
+
     def get_job_details(self, job_id):
         """Get details of job with ID job_id
 
@@ -106,6 +122,43 @@ class EPICClient(object):
         with epiccore.ApiClient(self.configuration) as api_client:
             instance = job_api.JobApi(api_client)
             return instance.job_read(job_id)
+
+    def get_job_step_details(self, step_id):
+        """Get the details of the step ID step_id
+
+            :param step_id: The ID of the job step to fetch
+            :type step_id: int
+            :return: A Job Step instance
+            :rtype: class:`epiccore.models.JobStep`
+        """
+        with epiccore.ApiClient(self.configuration) as api_client:
+            instance = jobstep_api.JobstepApi(api_client)
+            return instance.jobstep_read(step_id)
+
+    def get_step_logs(self, step_id):
+        """Get the step logs for step with id step_id
+
+            :param step_id: The ID of the step to fetch the logs for
+            :type step_id: int
+            :return: A Job Log instance
+            :rtype: class:`epiccore.models.JobLog`
+        """
+        with epiccore.ApiClient(self.configuration) as api_client:
+            instance = jobstep_api.JobstepApi(api_client)
+            return instance.jobstep_logs_read(step_id)
+
+    def refresh_step_logs(self, step_id):
+        """Request a refresh for the step logs for step with id step_id
+
+            :param step_id: The ID of the job to fetch the steps for
+            :type step_id: int
+            :return: A Job Log instance
+            :rtype: class:`epiccore.models.JobLog`
+        """
+        with epiccore.ApiClient(self.configuration) as api_client:
+            instance = jobstep_api.JobstepApi(api_client)
+            data = epiccore.JobLog()
+            return instance.jobstep_logs_update(step_id, data)
 
     def cancel_job(self, job_id):
         """Cancel job with ID job_id

@@ -368,6 +368,24 @@ To get the details of a specific job with a known ID using the get_job_details m
     jobs = client.get_job_details(18)
 
 
+Checking job logs
+-----------------
+
+Job logs are available for each step that makes up the job. The step id's for each job are listed in the job details and with that ID you can fetch the current log tails.
+
+.. code-block:: python
+
+    from pyepic.client import EPICClient
+
+    client = EPICClient("your_api_token_goes_here")
+
+    # Get details for job step id 50
+    jobs = client.get_step_logs(50)
+
+    # Request EPIC to refresh the log tails for that step
+    jobs = client.refresh_step_logs(50)
+    
+
 
 OpenFOAM
 ========
