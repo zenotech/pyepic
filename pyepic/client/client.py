@@ -1,5 +1,5 @@
 import epiccore
-from epiccore.api import job_api, catalog_api, jobstep_api
+from epiccore.api import job_api, catalog_api, jobstep_api, projects_api
 
 
 class APIListResponse(object):
@@ -15,7 +15,7 @@ class APIListResponse(object):
         pass
 
     @property 
-    def next():
+    def next(self):
         """
         :return next: The uri to get the next set of responses
         :rtype: str
@@ -23,7 +23,7 @@ class APIListResponse(object):
         pass
 
     @property
-    def previous():
+    def previous(self):
         """
         :return next: The uri to get the previous set of responses
         :rtype: str
@@ -31,7 +31,7 @@ class APIListResponse(object):
         pass
 
     @property
-    def results():
+    def results(self):
         """
         :return: A list of the repsonse objects for request
         :rtype: list
@@ -68,6 +68,27 @@ class EPICClient(object):
         with epiccore.ApiClient(self.configuration) as api_client:
             instance = job_api.JobApi(api_client)
             return instance.job_quote(job_spec)
+
+    def list_projects(self):
+        """ List all of the projects you have access to on EPIC."""
+        with epiccore.ApiClient(self.configuration) as api_client:
+            limit = 10
+            offset = 0
+            instance = projects_api.ProjectsApi(api_client)
+            results = instance.projects_list(limit=limit, offset=offset)
+            for result in results.results:
+                yield result
+            while results.next is not None:
+                offset += limit
+                results = instance.projects_list(limit=limit, offset=offset)
+                for result in results.results:
+                    yield result
+
+    def get_project_details(self, id: int):
+        with epiccore.ApiClient(self.configuration) as api_client:
+            instance = projects_api.ProjectsApi(api_client)
+            return instance.projects_read(id=id)
+
 
     def submit_job(self, job_array_spec):
         """Submit new job in EPIC as described by job_array_spec.
