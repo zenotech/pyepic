@@ -12,7 +12,7 @@ To initialise the client simply import EPICClient and then create a client insta
 .. code-block:: python
 
     from pyepic.client import EPICClient
-    
+
     client = EPICClient("your_api_token_goes_here")
 
 
@@ -25,11 +25,11 @@ To list the available applications you can use the list_applications() method. T
     from pyepic.client import EPICClient
 
     client = EPICClient("your_api_token_goes_here")
-    
+
     # List all applications
     apps = client.list_applications()
     print("ID | Application | Version | Cluster IDs")
-    for app in apps.results:
+    for app in apps
         for version in app.versions:
             print("{} | {} | {} | {}".format(version.id, app.product.name, version.version, version.queue_ids))
 
@@ -41,10 +41,8 @@ An example of the output of list_applications is shown below. The ID listed in t
 
 .. code-block:: json
 
-    {'count': 2,
-    'next': None,
-    'previous': None,
-    'results': [{'id': 2,
+    [
+                {'id': 2,
                 'product': {'description': 'The goal of the Extend-Project is to '
                                             'open the FOAM CFD toolbox to '
                                             'community contributed extensions in '
@@ -75,7 +73,8 @@ An example of the output of list_applications is shown below. The ID listed in t
                             {'id': 11, 'queue_ids': [5], 'version': '4.1'},
                             {'id': 10, 'queue_ids': [5], 'version': '3.0.1'},
                             {'id': 9, 'queue_ids': [5], 'version': '2.4.0'},
-                            {'id': 8, 'queue_ids': [5], 'version': '2.3.1'}]}]}
+                            {'id': 8, 'queue_ids': [5], 'version': '2.3.1'}]}
+    ]
 
 Listing Queues
 --------------
@@ -90,11 +89,14 @@ To list queues use the list_clusters() method. You can filter by cluster name or
 
     # List all clusters
     clusters = client.list_clusters()
-    for cluster in clusters.results:
+    for cluster in clusters:
         print("{} | {} | {}".format(cluster.id, cluster.display_name, cluster.display_description))
 
     # List clusters with a filter for a cluster name
     clusters = client.list_clusters(cluster_name="csd3")
+
+    # List cluster with a filter for a queue name
+    clusters = client.list_clusters(queue_name="gpu")
 
     # List clusters with a filter for a particular application versions, for example list applications above gives "OpenFOAM v1606" ID=12
     clusters = client.list_clusters(application_id=12)
@@ -104,10 +106,8 @@ An example response is shown below. The id listed is the batch queue id needed w
 
 .. code-block:: json
 
-    {'count': 3,
-    'next': None,
-    'previous': None,
-    'results': [{'display_description': 'The CFMS cluster is built using the Cray '
+    [
+               {'display_description': 'The CFMS cluster is built using the Cray '
                                         'CS-400 solution, with parallel file '
                                         'storage provided by ArcaStream, based '
                                         'upon IBM Spectrum Scale (formerly known '
@@ -126,7 +126,7 @@ An example response is shown below. The id listed is the batch queue id needed w
                                     "'threads_per_core': 1, 'accelerator': "
                                     "{'name': 'K80 x 2', 'acc_class': 'CUDA', "
                                     "'quantity': 2, 'description': '2 x Nvidia "
-                                    "K80'}, 'accelerator_count': 2, 'memory': "
+                                    "K80'}, 'memory': "
                                     "'64.0'}",
                 'sla': {'description': 'The jobs will be scheduled using the '
                                         'clusters standard batch scheduling '
@@ -149,7 +149,7 @@ An example response is shown below. The id listed is the batch queue id needed w
                 'reported_max_tasks': None,
                 'resource_config': "{'cpus': 2, 'cores_per_cpu': 8, "
                                     "'threads_per_core': 1, 'accelerator': None, "
-                                    "'accelerator_count': 0, 'memory': '256.0'}",
+                                    "'memory': '256.0'}",
                 'sla': {'description': 'The jobs will be scheduled using the '
                                         'clusters standard batch scheduling '
                                         'policy.',
@@ -180,7 +180,8 @@ An example response is shown below. The id listed is the batch queue id needed w
                                         'your jobs are at risk of being stopped '
                                         'if a higher priority job requires the '
                                         'resources.',
-                        'name': 'Low'}}]}
+                        'name': 'Low'}}
+    ]
 
 Listing Jobs
 --------------
@@ -196,7 +197,7 @@ To list jobs use the list_jobs() method. You can filter by cluster name or by av
     jobs = client.list_jobs()
 
     print("ID | Name | Application | Status")
-    for job in jobs.results:
+    for job in jobs:
         print("{} | {} | {} | {}".format(job.id, job.name, job.app, job.status))
 
 
@@ -204,10 +205,8 @@ An example output is shown below.
 
 .. code-block:: json
 
-    {'count': 3,
-    'next': None,
-    'previous': None,
-    'results': [{'app': 'OpenFOAM (v1606+)',
+    [
+                {'app': 'OpenFOAM (v1606+)',
                 'application_version': 12,
                 'config': {'data_sync_interval': 0,
                             'overwrite_existing': True,
@@ -245,7 +244,6 @@ An example output is shown below.
                             'resource_config': "{'cpus': 2, 'cores_per_cpu': "
                                                 "18, 'threads_per_core': 2, "
                                                 "'accelerator': None, "
-                                                "'accelerator_count': 0, "
                                                 "'memory': '60.0'}",
                             'sla': {'description': 'The nodes used may be '
                                                     'reclaimed if demand for '
@@ -294,7 +292,6 @@ An example output is shown below.
                             'resource_config': "{'cpus': 2, 'cores_per_cpu': "
                                                 "18, 'threads_per_core': 2, "
                                                 "'accelerator': None, "
-                                                "'accelerator_count': 0, "
                                                 "'memory': '60.0'}",
                             'sla': {'description': 'The nodes used may be '
                                                     'reclaimed if demand for '
@@ -343,7 +340,6 @@ An example output is shown below.
                             'resource_config': "{'cpus': 2, 'cores_per_cpu': "
                                                 "18, 'threads_per_core': 2, "
                                                 "'accelerator': None, "
-                                                "'accelerator_count': 0, "
                                                 "'memory': '60.0'}",
                             'sla': {'description': 'The nodes used may be '
                                                     'reclaimed if demand for '
@@ -353,7 +349,8 @@ An example output is shown below.
                                     'name': 'Spot'}},
                 'status': 'Job Complete',
                 'submitted_at': '2020-10-01T13:40:45.102124Z',
-                'submitted_by': 'Mike Turner'}]}
+                'submitted_by': 'Mike Turner'}
+    ]
 
 
 To get the details of a specific job with a known ID using the get_job_details method.
@@ -384,13 +381,13 @@ Job logs are available for each step that makes up the job. The step id's for ea
 
     # Request EPIC to refresh the log tails for that step
     jobs = client.refresh_step_logs(50)
-    
+
 
 
 OpenFOAM
 ========
-To create and submit an OpenFOAM job you can use the :class:`pyepic.applications.openfoam.OpenFoamJob` class. 
-Prior to creating the job you need to know the ID over the application version you wish to use, the id of the batch queue you want to 
+To create and submit an OpenFOAM job you can use the :class:`pyepic.applications.openfoam.OpenFoamJob` class.
+Prior to creating the job you need to know the ID over the application version you wish to use, the id of the batch queue you want to
 submit to and the path to the root of the openfoam case. The data for this case is assumed to have already been uploaded to your EPIC data store.
 
 .. code-block:: python
@@ -418,8 +415,8 @@ The submit_job method will return a job object. The job_id can be extraced from 
 
 zCFD
 ====
-To create and submit an zCFD job you can use the :class:`pyepic.applications.zcfd.ZCFDJob` class. 
-Prior to creating the job you need to know the ID over the application version you wish to use, the id of the batch queue you want to 
+To create and submit an zCFD job you can use the :class:`pyepic.applications.zcfd.ZCFDJob` class.
+Prior to creating the job you need to know the ID over the application version you wish to use, the id of the batch queue you want to
 submit to and the path to the root of the zcfd case. The data for this case is assumed to have already been uploaded to your EPIC data store.
 
 
