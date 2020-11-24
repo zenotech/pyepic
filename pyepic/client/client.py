@@ -1,43 +1,10 @@
 import epiccore
 
 
-class APIListResponse(object):
-    """An abstract representation of the response from an EPIC API list request
-    """
-
-    @property
-    def count(self):
-        """
-        :return: Number of results returned
-        :rtype: int
-        """
-        pass
-
-    @property
-    def next(self):
-        """
-        :return next: The uri to get the next set of responses
-        :rtype: str
-        """
-        pass
-
-    @property
-    def previous(self):
-        """
-        :return next: The uri to get the previous set of responses
-        :rtype: str
-        """
-        pass
-
-    @property
-    def results(self):
-        """
-        :return: A list of the repsonse objects for request
-        :rtype: list
-        """
-        pass
-
 class EPICClient(object):
+
+    LIMIT = 10
+
     """A wrapper class around the epiccore API.
 
             :param connection_token: Your EPIC API authentication token
@@ -71,7 +38,7 @@ class EPICClient(object):
     def list_teams(self):
         """ List all of the teamss you have access to on EPIC."""
         with epiccore.ApiClient(self.configuration) as api_client:
-            limit = 10
+            limit = self.LIMIT
             offset = 0
             instance = epiccore.TeamsApi(api_client)
             results = instance.teams_list(limit=limit, offset=offset)
@@ -91,7 +58,7 @@ class EPICClient(object):
     def list_projects(self):
         """ List all of the projects you have access to on EPIC."""
         with epiccore.ApiClient(self.configuration) as api_client:
-            limit = 10
+            limit = self.LIMIT
             offset = 0
             instance = epiccore.ProjectsApi(api_client)
             results = instance.projects_list(limit=limit, offset=offset)
@@ -127,7 +94,7 @@ class EPICClient(object):
             :return: Response with results of returned :class:`epiccore.models.Job` objects
         """
         with epiccore.ApiClient(self.configuration) as api_client:
-            limit = 10
+            limit = self.LIMIT
             offset = 0
             instance = epiccore.JobApi(api_client)
             results = instance.job_list(limit=limit, offset=offset)
@@ -149,11 +116,19 @@ class EPICClient(object):
             :param offset: The initial index from which to return the results, defaults to 0
             :type offset: int
             :return: Response with results of returned :class:`epiccore.models.JobStep` objects
-            :rtype: class:`APIListResponse`
         """
         with epiccore.ApiClient(self.configuration) as api_client:
+            limit = self.LIMIT
+            offset = 0
             instance = epiccore.JobstepApi(api_client)
-            return instance.jobstep_list(parent_job=parent_job, limit=limit, offset=offset)
+            results = instance.jobsetp_list(limit=limit, offset=offset, parent_job=parent_job)
+            for result in results.results:
+                yield result
+            while results.next is not None:
+                offset += limit
+                results = instance.job_list(limit=limit, offset=offset)
+                for result in results.results:
+                    yield result
 
     def get_job_details(self, job_id):
         """Get details of job with ID job_id
@@ -224,7 +199,7 @@ class EPICClient(object):
             :return: Response with results of returned :class:`epiccore.models.BatchQueueDetails` objects
         """
         with epiccore.ApiClient(self.configuration) as api_client:
-            limit = 10
+            limit = self.LIMIT
             offset = 0
             instance = epiccore.CatalogApi(api_client)
             results = instance.catalog_clusters_list(limit=limit, offset=offset)
@@ -246,11 +221,16 @@ class EPICClient(object):
             :param product_name: Filter clusters by application name.
             :type product_name: str, optional
             :return: Response with results of returned :class:`epiccore.models.BatchApplicationDetails` objects
-            :rtype: class:`APIListResponse`
         """
         with epiccore.ApiClient(self.configuration) as api_client:
+            limit = self.LIMIT
+            offset = 0
             instance = epiccore.CatalogApi(api_client)
-            return instance.catalog_applications_list(limit=limit, offset=offset, product_name=product_name)
-
-
-
+            results = instance.catalog_applications_list(limit=limit, offset=offset, product_name=product_name)
+            for result in results.results:
+                yield result
+            while results.next is not None:
+                offset += limit
+                results = instance.catalog_applications_list(limit=limit, offset=offset, product_name=product_name)
+                for result in results.results:
+                    yield result
