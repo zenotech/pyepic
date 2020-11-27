@@ -39,12 +39,7 @@ class JobClient(Client):
     def list(self, limit=10, offset=0):
         """List all of the jobs in EPIC. 
 
-            :param limit: Number of results to return per request, defaults to 10
-            :type limit: int
-            :param offset: The initial index from which to return the results, defaults to 0
-            :type offset: int
             :return: Response with results of returned :class:`epiccore.models.Job` objects
-            :rtype: class:`APIListResponse`
         """
         with epiccore.ApiClient(self.configuration) as api_client:
             instance = epiccore.JobApi(api_client)
@@ -60,7 +55,6 @@ class JobClient(Client):
             :param offset: The initial index from which to return the results, defaults to 0
             :type offset: int
             :return: Response with results of returned :class:`epiccore.models.JobStep` objects
-            :rtype: class:`APIListResponse`
         """
         with epiccore.ApiClient(self.configuration) as api_client:
             instance = epiccore.JobstepApi(api_client)
