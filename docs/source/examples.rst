@@ -36,7 +36,7 @@ To list the available applications you can use the list_applications() method. T
     # List all applications
     apps = client.catalog.list_applications()
     print("ID | Application | Version | Cluster IDs")
-    for app in apps
+    for app in apps:
         for version in app.versions:
             print("{} | {} | {} | {}".format(version.id, app.product.name, version.version, version.queue_ids))
 
@@ -96,8 +96,8 @@ To list queues use the list_clusters() method. You can filter by cluster name or
 
     # List all clusters
     clusters = client.catalog.list_clusters()
-    for cluster in clusters.results:
-        print("{} | {} | {}".format(cluster.id, cluster.display_name, cluster.display_description))
+    for cluster in clusters:
+        print("{} | {} | {}".format(cluster.id, cluster.name, cluster.description))
 
     # List clusters with a filter for a cluster name
     clusters = client.catalog.list_clusters(cluster_name="csd3")
@@ -206,7 +206,7 @@ To list the types of desktop nodes available in epic use the catalog.list_deskto
 
     # Look at the results
     print("Name | Version Name | Version ID | Valid Node Types | Valid connection Types")
-    for desktop in desktops.results:
+    for desktop in desktops:
         valid_connections = [conn.id for conn in desktop.connection_types]
         valid_node_types = [node_type.id for node_type in desktop.node_types]
         for version in desktop.versions:
@@ -223,85 +223,83 @@ An example json output from list_desktops is shown below
 
 .. code-block:: json
 
-    {'count': 2,
-    'next': None,
-    'previous': None,
-    'results': [{'connection_types': [{'description': 'Connect using Nice DCV in '
-                                                    'your browser',
-                                        'id': 3,
-                                        'name': 'DCV'}],
-                'description': 'NICE Desktop Cloud Visualization (DCV) enables '
-                                'remote access 2D/3D interactive applications '
-                                'over a standard network. EPIC will start a DCV '
-                                'instance that you can connect to with your '
-                                'browser with several versions of Paraview '
-                                'installed and ready to go.',
-                'id': 2,
-                'image': '/media/viz/dcv.png',
-                'name': 'DCV (Paraview)',
-                'node_types': [{'cores': 4,
-                                'description': '4 Broadwell CPU Cores, 30.5GiB '
-                                                'Memory, 1 x Tesla M60 GPU with '
-                                                '2048 CUDA cores and 8GB GPU '
-                                                'Memory',
-                                'gpus': 1,
-                                'id': 1,
-                                'name': 'Standard GPU Node'},
-                                {'cores': 32,
-                                'description': '32 Broadwell CPU Cores, 244GiB '
-                                                'Memory, 2 x Tesla M60 GPU with '
-                                                '2048 CUDA cores and 8GB GPU '
-                                                'Memory',
-                                'gpus': 2,
-                                'id': 2,
-                                'name': 'Large GPU Node'},
-                                {'cores': 64,
-                                'description': '64 Broadwell CPU Cores, 488GiB '
-                                                'Memory, 4 x Tesla M60 GPU with '
-                                                '2048 CUDA cores and 8GB GPU '
-                                                'Memory',
-                                'gpus': 4,
+    [
+            {'connection_types': [{'description': 'Connect using Nice DCV in '
+                                            'your browser',
                                 'id': 3,
-                                'name': 'Extra Large GPU Node'}],
-                'versions': [{'application_version': 'DCV 2017', 'id': 4}]},
-                {'connection_types': [{'description': 'Connect using Nice DCV in '
-                                                    'your browser',
-                                        'id': 3,
-                                        'name': 'DCV'}],
-                'description': 'zCAD is an CAD repair and mesh generation tool '
-                                'from Zenotech. EPIC will start a DCV instance '
-                                'that you can connect to with your browser with '
-                                'zCAD and other Zenotech tools installed and '
-                                'ready to go.',
-                'id': 3,
-                'image': '/media/viz/zcad.png',
-                'name': 'zCAD',
-                'node_types': [{'cores': 4,
-                                'description': '4 Broadwell CPU Cores, 30.5GiB '
-                                                'Memory, 1 x Tesla M60 GPU with '
-                                                '2048 CUDA cores and 8GB GPU '
-                                                'Memory',
-                                'gpus': 1,
-                                'id': 1,
-                                'name': 'Standard GPU Node'},
-                                {'cores': 32,
-                                'description': '32 Broadwell CPU Cores, 244GiB '
-                                                'Memory, 2 x Tesla M60 GPU with '
-                                                '2048 CUDA cores and 8GB GPU '
-                                                'Memory',
-                                'gpus': 2,
-                                'id': 2,
-                                'name': 'Large GPU Node'},
-                                {'cores': 64,
-                                'description': '64 Broadwell CPU Cores, 488GiB '
-                                                'Memory, 4 x Tesla M60 GPU with '
-                                                '2048 CUDA cores and 8GB GPU '
-                                                'Memory',
-                                'gpus': 4,
-                                'id': 3,
-                                'name': 'Extra Large GPU Node'}],
-                'versions': [{'application_version': '2016.9', 'id': 5}]}]}
-
+                                'name': 'DCV'}],
+            'description': 'NICE Desktop Cloud Visualization (DCV) enables '
+                            'remote access 2D/3D interactive applications '
+                            'over a standard network. EPIC will start a DCV '
+                            'instance that you can connect to with your '
+                            'browser with several versions of Paraview '
+                            'installed and ready to go.',
+            'id': 2,
+            'image': '/media/viz/dcv.png',
+            'name': 'DCV (Paraview)',
+            'node_types': [{'cores': 4,
+                            'description': '4 Broadwell CPU Cores, 30.5GiB '
+                                            'Memory, 1 x Tesla M60 GPU with '
+                                            '2048 CUDA cores and 8GB GPU '
+                                            'Memory',
+                            'gpus': 1,
+                            'id': 1,
+                            'name': 'Standard GPU Node'},
+                            {'cores': 32,
+                            'description': '32 Broadwell CPU Cores, 244GiB '
+                                            'Memory, 2 x Tesla M60 GPU with '
+                                            '2048 CUDA cores and 8GB GPU '
+                                            'Memory',
+                            'gpus': 2,
+                            'id': 2,
+                            'name': 'Large GPU Node'},
+                            {'cores': 64,
+                            'description': '64 Broadwell CPU Cores, 488GiB '
+                                            'Memory, 4 x Tesla M60 GPU with '
+                                            '2048 CUDA cores and 8GB GPU '
+                                            'Memory',
+                            'gpus': 4,
+                            'id': 3,
+                            'name': 'Extra Large GPU Node'}],
+            'versions': [{'application_version': 'DCV 2017', 'id': 4}]},
+            {'connection_types': [{'description': 'Connect using Nice DCV in '
+                                                'your browser',
+                                    'id': 3,
+                                    'name': 'DCV'}],
+            'description': 'zCAD is an CAD repair and mesh generation tool '
+                            'from Zenotech. EPIC will start a DCV instance '
+                            'that you can connect to with your browser with '
+                            'zCAD and other Zenotech tools installed and '
+                            'ready to go.',
+            'id': 3,
+            'image': '/media/viz/zcad.png',
+            'name': 'zCAD',
+            'node_types': [{'cores': 4,
+                            'description': '4 Broadwell CPU Cores, 30.5GiB '
+                                            'Memory, 1 x Tesla M60 GPU with '
+                                            '2048 CUDA cores and 8GB GPU '
+                                            'Memory',
+                            'gpus': 1,
+                            'id': 1,
+                            'name': 'Standard GPU Node'},
+                            {'cores': 32,
+                            'description': '32 Broadwell CPU Cores, 244GiB '
+                                            'Memory, 2 x Tesla M60 GPU with '
+                                            '2048 CUDA cores and 8GB GPU '
+                                            'Memory',
+                            'gpus': 2,
+                            'id': 2,
+                            'name': 'Large GPU Node'},
+                            {'cores': 64,
+                            'description': '64 Broadwell CPU Cores, 488GiB '
+                                            'Memory, 4 x Tesla M60 GPU with '
+                                            '2048 CUDA cores and 8GB GPU '
+                                            'Memory',
+                            'gpus': 4,
+                            'id': 3,
+                            'name': 'Extra Large GPU Node'}],
+            'versions': [{'application_version': '2016.9', 'id': 5}]}
+    ]
 
 Jobs
 ====
@@ -573,7 +571,7 @@ Desktops
 
 Listing Desktop Instances
 -------------------------
-To list your desktop instances use the list and get_details methods in :class:`pyepic.client.EPICClient.desktop`.
+To list your desktop instances use the list and get_details methods in :class:`pyepic.client.EPICClient.desktops`.
 
 .. code-block:: python
 
@@ -582,10 +580,10 @@ To list your desktop instances use the list and get_details methods in :class:`p
     client = EPICClient("your_api_token_goes_here")
 
     # List all of my desktop instances
-    desktops = client.desktop.list()
+    desktops = client.desktops.list()
 
     # Get the details of desktop id 3
-    desktop_instance = client.desktop.get_details(3)
+    desktop_instance = client.desktops.get_details(3)
 
 
 Getting a quote for a Desktop
@@ -608,7 +606,7 @@ The valid application_version, node_type and connection_type values can be retri
     my_desktop.runtime = 2
 
     # Get a quote for this desktop
-    quote = client.desktop.get_quote(my_desktop.get_quote_spec()))
+    quote = client.desktops.get_quote(my_desktop.get_quote_spec()))
 
 An example response for the quote is shown below.
 
@@ -637,7 +635,7 @@ The valid application_version, node_type and connection_type values can be retri
     my_desktop.runtime = 2
 
     # Launch this desktop
-    instance = client.desktop.launch(my_desktop.get_launch_spec()))
+    instance = client.desktops.launch(my_desktop.get_launch_spec()))
 
     # Get the newly created desktop instance id.
     id = instance.id
@@ -682,4 +680,43 @@ Terminate a desktop using the terminate client method and the Desktops ID.
     client = EPICClient("your_api_token_goes_here")
 
     # Terminate desktop with ID 3
-    client.desktop.terminate(3)
+    client.desktops.terminate(3)
+
+
+Teams
+=====
+
+.. code-block:: python
+
+    from pyepic import EPICClient
+    from pyepic.desktops import Desktop
+
+    client = EPICClient("your_api_token_goes_here")
+
+    # List teams
+    teams = client.teams.list()
+    
+    for team in teams:
+        print(team)
+
+    # Get team ID 334
+    team = client.teams.get_details(334)
+
+Projects
+========
+
+.. code-block:: python
+
+    from pyepic import EPICClient
+    from pyepic.desktops import Desktop
+
+    client = EPICClient("your_api_token_goes_here")
+
+    # List projects
+    projects = client.projects.list()
+
+    for project in projects:
+        print(project)
+
+    # Get project ID 102
+    project = client.projects.get_details(102)

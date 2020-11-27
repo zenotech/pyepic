@@ -37,19 +37,24 @@ class DesktopClient(Client):
             instance = epiccore.DesktopApi(api_client)
             return instance.desktop_create(desktop_spec)
 
-    def list(self, limit=10, offset=0):
+    def list(self):
         """List all of your Desktops in EPIC. 
 
-            :param limit: Number of results to return per request, defaults to 10
-            :type limit: int
-            :param offset: The initial index from which to return the results, defaults to 0
-            :type offset: int
-            :return: Response with results of returned :class:`epiccore.models.Job` objects
-            :rtype: class:`APIListResponse`
+            :return: Iterable collection of DesktopInstance
+            :rtype: collections.Iterable[:class:`epiccore.models.DesktopInstance`] 
         """
         with epiccore.ApiClient(self.configuration) as api_client:
+            limit = self.LIMIT
+            offset = 0
             instance = epiccore.DesktopApi(api_client)
-            return instance.desktop_list(limit=limit, offset=offset)
+            results = instance.desktop_list(limit=limit, offset=offset)
+            for result in results.results:
+                yield result
+            while results.next is not None:
+                offset += limit
+                results = instance.desktop_list(limit=limit, offset=offset)
+                for result in results.results:
+                    yield result
 
     def get_details(self, id):
         """Get details of desktop with ID id

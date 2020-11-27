@@ -1,43 +1,5 @@
 import epiccore
 
-
-class APIListResponse(object):
-    """An abstract representation of the response from an EPIC API list request
-    """
-
-    @property
-    def count(self):
-        """
-        :return: Number of results returned
-        :rtype: int
-        """
-        pass
-
-    @property
-    def next():
-        """
-        :return next: The uri to get the next set of responses
-        :rtype: str
-        """
-        pass
-
-    @property
-    def previous():
-        """
-        :return next: The uri to get the previous set of responses
-        :rtype: str
-        """
-        pass
-
-    @property
-    def results():
-        """
-        :return: A list of the repsonse objects for request
-        :rtype: list
-        """
-        pass
-
-
 class Client(object):
     """Base client class for API wrappers
 
@@ -51,6 +13,7 @@ class Client(object):
     def __init__(self, connection_token, connection_url="https://epic.zenotech.com/api/v2"):
         """Constructor method
         """
+        self.LIMIT = 10
         self.configuration = epiccore.Configuration(
             host=connection_url,
             api_key={
@@ -71,8 +34,12 @@ class EPICClient(object):
             :vartype job: :class:`JobClient`
             :var catalog: API to Catalog functions
             :vartype catalog: :class:`CatalogClient`
-            :var desktop: API to Desktops functions
-            :vartype desktop: :class:`DesktopClient`
+            :var desktops: API to Desktops functions
+            :vartype desktops: :class:`DesktopClient`
+            :var projects: API to Projects functions
+            :vartype projects: :class:`ProjectClient`
+            :var teams: API to Teams functions
+            :vartype teams: :class:`TeamsClient`
         """
 
     def __init__(self, connection_token, connection_url="https://epic.zenotech.com/api/v2"):
@@ -81,7 +48,11 @@ class EPICClient(object):
         from .job import JobClient
         from .catalog import CatalogClient
         from .desktop import DesktopClient
-
+        from .projects import ProjectClient
+        from .teams import TeamsClient
+    
         self.job = JobClient(connection_token, connection_url=connection_url)
         self.catalog = CatalogClient(connection_token, connection_url=connection_url)
-        self.desktop = DesktopClient(connection_token, connection_url=connection_url)
+        self.desktops = DesktopClient(connection_token, connection_url=connection_url)
+        self.projects = ProjectClient(connection_token, connection_url=connection_url)
+        self.teams = TeamsClient(connection_token, connection_url=connection_url)

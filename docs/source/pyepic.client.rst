@@ -36,6 +36,22 @@ pyepic.client.job module
    :undoc-members:
    :show-inheritance:
 
+pyepic.client.projects module
+-----------------------------
+
+.. automodule:: pyepic.client.projects
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+pyepic.client.teams module
+--------------------------
+
+.. automodule:: pyepic.client.teams
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 

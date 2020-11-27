@@ -36,29 +36,46 @@ class JobClient(Client):
             instance = epiccore.JobApi(api_client)
             return instance.job_create(job_array_spec)
 
-    def list(self, limit=10, offset=0):
+    def list(self):
         """List all of the jobs in EPIC. 
 
-            :return: Response with results of returned :class:`epiccore.models.Job` objects
+            :return: Iterable collection of Jobs
+            :rtype: collections.Iterable[:class:`epiccore.models.Job`] 
         """
         with epiccore.ApiClient(self.configuration) as api_client:
+            limit = self.LIMIT
+            offset = 0
             instance = epiccore.JobApi(api_client)
-            return instance.job_list(limit=limit, offset=offset)
+            results = instance.job_list(limit=limit, offset=offset)
+            for result in results.results:
+                yield result
+            while results.next is not None:
+                offset += limit
+                results = instance.job_list(limit=limit, offset=offset)
+                for result in results.results:
+                    yield result
 
-    def list_steps(self, parent_job=None, limit=10, offset=0):
+    def list_steps(self, parent_job=None):
         """List all of the job steps in EPIC. 
 
             :param parent_job: The ID of the parent job to list the steps for
             :type parent_job: int, optional
-            :param limit: Number of results to return per request, defaults to 10
-            :type limit: int
-            :param offset: The initial index from which to return the results, defaults to 0
-            :type offset: int
-            :return: Response with results of returned :class:`epiccore.models.JobStep` objects
+
+            :return: Iterable collection of Job Steps
+            :rtype: collections.Iterable[:class:`epiccore.models.JobStep`] 
         """
         with epiccore.ApiClient(self.configuration) as api_client:
+            limit = self.LIMIT
+            offset = 0
             instance = epiccore.JobstepApi(api_client)
-            return instance.jobstep_list(parent_job=parent_job, limit=limit, offset=offset)
+            results = instance.jobstep_list(limit=limit, offset=offset, parent_job=parent_job)
+            for result in results.results:
+                yield result
+            while results.next is not None:
+                offset += limit
+                results = instance.job_list(limit=limit, offset=offset)
+                for result in results.results:
+                    yield result
 
     def get_details(self, job_id):
         """Get details of job with ID job_id
