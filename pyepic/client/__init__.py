@@ -1,1 +1,1 @@
-from .client import EPICClient
+from .base import EPICClient

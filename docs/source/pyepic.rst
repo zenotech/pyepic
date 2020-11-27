@@ -9,6 +9,7 @@ Subpackages
 
    pyepic.applications
    pyepic.client
+   pyepic.desktops
 
 Module contents
 ---------------

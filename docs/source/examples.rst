@@ -11,10 +11,17 @@ To initialise the client simply import EPICClient and then create a client insta
 
 .. code-block:: python
 
-    from pyepic.client import EPICClient
+    from pyepic import EPICClient
     
     client = EPICClient("your_api_token_goes_here")
 
+You can then access the appropriate client api using the corresponding api member variable. 
+
+
+Catalog
+=======
+The catalog API allows you to list the current configurations available for Jobs, Applications and Desktops in EPIC.
+This can be used to get the IDs necessary for launching a job or desktop with the correct configuration.
 
 Listing Applications
 --------------------
@@ -22,19 +29,19 @@ To list the available applications you can use the list_applications() method. T
 
 .. code-block:: python
 
-    from pyepic.client import EPICClient
+    from pyepic import EPICClient
 
     client = EPICClient("your_api_token_goes_here")
     
     # List all applications
-    apps = client.list_applications()
+    apps = client.catalog.list_applications()
     print("ID | Application | Version | Cluster IDs")
     for app in apps.results:
         for version in app.versions:
             print("{} | {} | {} | {}".format(version.id, app.product.name, version.version, version.queue_ids))
 
     # List applications but filter for "foam" in the application name
-    foam_apps = client.list_applications(product_name="foam")
+    foam_apps = client.catalog.list_applications(product_name="foam")
 
 
 An example of the output of list_applications is shown below. The ID listed in the versions dictionary is the application_version_id used when creating a job for that application.
@@ -84,23 +91,23 @@ To list queues use the list_clusters() method. You can filter by cluster name or
 
 .. code-block:: python
 
-    from pyepic.client import EPICClient
+    from pyepic import EPICClient
 
     client = EPICClient("your_api_token_goes_here")
 
     # List all clusters
-    clusters = client.list_clusters()
+    clusters = client.catalog.list_clusters()
     for cluster in clusters.results:
         print("{} | {} | {}".format(cluster.id, cluster.display_name, cluster.display_description))
 
     # List clusters with a filter for a cluster name
-    clusters = client.list_clusters(cluster_name="csd3")
+    clusters = client.catalog.list_clusters(cluster_name="csd3")
 
     # List clusters with a filter for a particular application versions, for example list applications above gives "OpenFOAM v1606" ID=12
-    clusters = client.list_clusters(application_id=12)
+    clusters = client.catalog.list_clusters(application_id=12)
 
 
-An example response is shown below. The id listed is the batch queue id needed when submitting an EPIC job to that queue.
+An example json response is shown below. The id listed is the batch queue id needed when submitting an EPIC job to that queue.
 
 .. code-block:: json
 
@@ -182,6 +189,124 @@ An example response is shown below. The id listed is the batch queue id needed w
                                         'resources.',
                         'name': 'Low'}}]}
 
+Listing Desktop Types
+---------------------
+
+To list the types of desktop nodes available in epic use the catalog.list_desktops() method. 
+
+.. code-block:: python
+
+    from pyepic import EPICClient
+
+    client = EPICClient("your_api_token_goes_here")
+
+    # List desktop types
+    desktops = client.catalog.list_desktops()
+
+    # Look at the results
+    print("Name | Version Name | Version ID | Valid Node Types | Valid connection Types")
+    for desktop in desktops.results:
+        valid_connections = [conn.id for conn in desktop.connection_types]
+        valid_node_types = [node_type.id for node_type in desktop.node_types]
+        for version in desktop.versions:
+            print("{} | {} | {} | {} | {}".format(
+                desktop.name,
+                version.application_version,
+                version.id,
+                valid_node_types,
+                valid_connections
+            ))
+
+
+An example json output from list_desktops is shown below
+
+.. code-block:: json
+
+    {'count': 2,
+    'next': None,
+    'previous': None,
+    'results': [{'connection_types': [{'description': 'Connect using Nice DCV in '
+                                                    'your browser',
+                                        'id': 3,
+                                        'name': 'DCV'}],
+                'description': 'NICE Desktop Cloud Visualization (DCV) enables '
+                                'remote access 2D/3D interactive applications '
+                                'over a standard network. EPIC will start a DCV '
+                                'instance that you can connect to with your '
+                                'browser with several versions of Paraview '
+                                'installed and ready to go.',
+                'id': 2,
+                'image': '/media/viz/dcv.png',
+                'name': 'DCV (Paraview)',
+                'node_types': [{'cores': 4,
+                                'description': '4 Broadwell CPU Cores, 30.5GiB '
+                                                'Memory, 1 x Tesla M60 GPU with '
+                                                '2048 CUDA cores and 8GB GPU '
+                                                'Memory',
+                                'gpus': 1,
+                                'id': 1,
+                                'name': 'Standard GPU Node'},
+                                {'cores': 32,
+                                'description': '32 Broadwell CPU Cores, 244GiB '
+                                                'Memory, 2 x Tesla M60 GPU with '
+                                                '2048 CUDA cores and 8GB GPU '
+                                                'Memory',
+                                'gpus': 2,
+                                'id': 2,
+                                'name': 'Large GPU Node'},
+                                {'cores': 64,
+                                'description': '64 Broadwell CPU Cores, 488GiB '
+                                                'Memory, 4 x Tesla M60 GPU with '
+                                                '2048 CUDA cores and 8GB GPU '
+                                                'Memory',
+                                'gpus': 4,
+                                'id': 3,
+                                'name': 'Extra Large GPU Node'}],
+                'versions': [{'application_version': 'DCV 2017', 'id': 4}]},
+                {'connection_types': [{'description': 'Connect using Nice DCV in '
+                                                    'your browser',
+                                        'id': 3,
+                                        'name': 'DCV'}],
+                'description': 'zCAD is an CAD repair and mesh generation tool '
+                                'from Zenotech. EPIC will start a DCV instance '
+                                'that you can connect to with your browser with '
+                                'zCAD and other Zenotech tools installed and '
+                                'ready to go.',
+                'id': 3,
+                'image': '/media/viz/zcad.png',
+                'name': 'zCAD',
+                'node_types': [{'cores': 4,
+                                'description': '4 Broadwell CPU Cores, 30.5GiB '
+                                                'Memory, 1 x Tesla M60 GPU with '
+                                                '2048 CUDA cores and 8GB GPU '
+                                                'Memory',
+                                'gpus': 1,
+                                'id': 1,
+                                'name': 'Standard GPU Node'},
+                                {'cores': 32,
+                                'description': '32 Broadwell CPU Cores, 244GiB '
+                                                'Memory, 2 x Tesla M60 GPU with '
+                                                '2048 CUDA cores and 8GB GPU '
+                                                'Memory',
+                                'gpus': 2,
+                                'id': 2,
+                                'name': 'Large GPU Node'},
+                                {'cores': 64,
+                                'description': '64 Broadwell CPU Cores, 488GiB '
+                                                'Memory, 4 x Tesla M60 GPU with '
+                                                '2048 CUDA cores and 8GB GPU '
+                                                'Memory',
+                                'gpus': 4,
+                                'id': 3,
+                                'name': 'Extra Large GPU Node'}],
+                'versions': [{'application_version': '2016.9', 'id': 5}]}]}
+
+
+Jobs
+====
+The job client gives access to job related methods.
+
+
 Listing Jobs
 --------------
 
@@ -189,11 +314,11 @@ To list jobs use the list_jobs() method. You can filter by cluster name or by av
 
 .. code-block:: python
 
-    from pyepic.client import EPICClient
+    from pyepic import EPICClient
 
     client = EPICClient("your_api_token_goes_here")
 
-    jobs = client.list_jobs()
+    jobs = client.job.list()
 
     print("ID | Name | Application | Status")
     for job in jobs.results:
@@ -360,12 +485,12 @@ To get the details of a specific job with a known ID using the get_job_details m
 
 .. code-block:: python
 
-    from pyepic.client import EPICClient
+    from pyepic import EPICClient
 
     client = EPICClient("your_api_token_goes_here")
 
     # Get details for job id 18
-    jobs = client.get_job_details(18)
+    jobs = client.job.get_details(18)
 
 
 Checking job logs
@@ -375,27 +500,31 @@ Job logs are available for each step that makes up the job. The step id's for ea
 
 .. code-block:: python
 
-    from pyepic.client import EPICClient
+    from pyepic import EPICClient
 
     client = EPICClient("your_api_token_goes_here")
 
     # Get details for job step id 50
-    jobs = client.get_step_logs(50)
+    jobs = client.job.get_step_logs(50)
 
     # Request EPIC to refresh the log tails for that step
-    jobs = client.refresh_step_logs(50)
-    
+    jobs = client.job.refresh_step_logs(50)
+
+
+Submitting Jobs
+---------------
+Submitting jobs is done with the client.job.submit() method. PyEpic has application specfic helper classes to make the submission as simple as possible, see the application examples below.
 
 
 OpenFOAM
-========
+--------
 To create and submit an OpenFOAM job you can use the :class:`pyepic.applications.openfoam.OpenFoamJob` class. 
 Prior to creating the job you need to know the ID over the application version you wish to use, the id of the batch queue you want to 
 submit to and the path to the root of the openfoam case. The data for this case is assumed to have already been uploaded to your EPIC data store.
 
 .. code-block:: python
 
-    from pyepic.client import EPICClient
+    from pyepic import EPICClient
     from pyepic.applications.openfoam import OpenFoamJob
 
     client = EPICClient("your_api_token_goes_here")
@@ -411,13 +540,13 @@ submit to and the path to the root of the openfoam case. The data for this case 
     job_spec = openfoam_job.get_job_create_spec(3)
 
     # Submit the job
-    job = client.submit_job(job_spec)
+    job = client.job.submit(job_spec)
 
 
 The submit_job method will return a job object. The job_id can be extraced from this object for future queries.
 
 zCFD
-====
+----
 To create and submit an zCFD job you can use the :class:`pyepic.applications.zcfd.ZCFDJob` class. 
 Prior to creating the job you need to know the ID over the application version you wish to use, the id of the batch queue you want to 
 submit to and the path to the root of the zcfd case. The data for this case is assumed to have already been uploaded to your EPIC data store.
@@ -425,9 +554,7 @@ submit to and the path to the root of the zcfd case. The data for this case is a
 
 .. code-block:: python
 
-    import pyepic
-
-    from pyepic.client import EPICClient
+    from pyepic import EPICClient
     from pyepic.applications.zcfd import ZCFDJob
 
     client = EPICClient("your_api_token_goes_here")
@@ -442,4 +569,121 @@ submit to and the path to the root of the zcfd case. The data for this case is a
     job_spec = zcfd_job.get_job_create_spec(3)
 
     # Submit the job
-    job = client.submit_job(job_spec)
+    job = client.job.submit(job_spec)
+
+
+Desktops
+========
+
+Listing Desktop Instances
+-------------------------
+To list your desktop instances use the list and get_details methods in :class:`pyepic.client.EPICClient.desktop`.
+
+.. code-block:: python
+
+    from pyepic import EPICClient
+
+    client = EPICClient("your_api_token_goes_here")
+
+    # List all of my desktop instances
+    desktops = client.desktop.list()
+
+    # Get the details of desktop id 3
+    desktop_instance = client.desktop.get_details(3)
+
+
+Getting a quote for a Desktop
+-----------------------------
+
+PyEpic provides the helper class :class:`pyepic.desktops.Desktop` to help create Desktops in EPIC. To get a quote create an instance of this class and then use that the retrieve the quote via the desktop client class.
+The valid application_version, node_type and connection_type values can be retrieved via :attr:`pyepic.EPICClient.catalog`..
+
+.. code-block:: python
+
+    from pyepic import EPICClient
+    from pyepic.desktops import Desktop
+
+    client = EPICClient("your_api_token_goes_here")
+
+    # Create a desktop spec
+    my_desktop = Desktop("epic://data_path/", application_version=5, node_type=1, connection_type=3)
+
+    # Set the runtime to two hours
+    my_desktop.runtime = 2
+
+    # Get a quote for this desktop
+    quote = client.desktop.get_quote(my_desktop.get_quote_spec()))
+
+An example response for the quote is shown below.
+
+.. code-block:: json
+
+    {'cost': {'amount': 0.71, 'currency': 'GBP'}, 'reason': '', 'valid': True}
+
+
+Launching a desktop
+-------------------
+
+PyEpic provides the helper class :class:`pyepic.desktops.Desktop` to help create Desktops in EPIC. To launch a desktop create an instance of this class and then use that to launch the desktop via the desktop client class.
+The valid application_version, node_type and connection_type values can be retrieved via :attr:`pyepic.EPICClient.catalog`.
+
+.. code-block:: python
+
+    from pyepic import EPICClient
+    from pyepic.desktops import Desktop
+
+    client = EPICClient("your_api_token_goes_here")
+
+    # Create a desktop spec
+    my_desktop = Desktop("epic://data_path/", application_version=5, node_type=1, connection_type=3)
+
+    # Set the runtime to two hours
+    my_desktop.runtime = 2
+
+    # Launch this desktop
+    instance = client.desktop.launch(my_desktop.get_launch_spec()))
+
+    # Get the newly created desktop instance id.
+    id = instance.id
+
+The launch method returns a :class:`epiccore.models.DesktopInstance` object that includes the newly created desktop instance ID. If there is an issue with the specification then launch will return the list of validation errors.
+An example response is shown below.
+
+.. code-block:: json
+
+    {'application': {'application': {'description': 'zCAD is an CAD repair and '
+                                                    'mesh generation tool from '
+                                                    'Zenotech. EPIC will start a '
+                                                    'DCV instance that you can '
+                                                    'connect to with your browser '
+                                                    'with zCAD and other Zenotech '
+                                                    'tools installed and ready to '
+                                                    'go.',
+                                    'image': '/media/viz/zcad.png',
+                                    'name': 'zCAD'},
+                    'application_version': '2016.9',
+                    'id': 5},
+    'connection_string': None,
+    'connection_type': {'description': 'Connect using Nice DCV in your browser',
+                        'id': 3,
+                        'name': 'DCV'},
+    'created': datetime.datetime(2020, 11, 27, 9, 19, 47, 127429, tzinfo=tzutc()),
+    'id': 11,
+    'launched_by': 'Danny Develop',
+    'status': 'new',
+    'team': None}
+
+
+Terminating a desktop
+---------------------
+Terminate a desktop using the terminate client method and the Desktops ID.
+
+.. code-block:: python
+
+    from pyepic import EPICClient
+    from pyepic.desktops import Desktop
+
+    client = EPICClient("your_api_token_goes_here")
+
+    # Terminate desktop with ID 3
+    client.desktop.terminate(3)
