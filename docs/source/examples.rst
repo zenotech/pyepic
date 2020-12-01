@@ -542,7 +542,7 @@ The submit_job method will return a job object. The job_id can be extraced from 
 zCFD
 ----
 To create and submit an zCFD job you can use the :class:`pyepic.applications.zcfd.ZCFDJob` class. 
-Prior to creating the job you need to know the ID over the application version you wish to use, the id of the batch queue you want to 
+Prior to creating the job you need to know the ID of the application version you wish to use, the id of the batch queue you want to 
 submit to and the path to the root of the zcfd case. The data for this case is assumed to have already been uploaded to your EPIC data store.
 
 
