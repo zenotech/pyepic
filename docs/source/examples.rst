@@ -103,7 +103,7 @@ To list queues use the list_clusters() method. You can filter by cluster name or
     clusters = client.catalog.list_clusters(cluster_name="csd3")
 
     # List cluster with a filter for a queue name
-    clusters = client.list_clusters(queue_name="gpu")
+    clusters = client.catalog.list_clusters(queue_name="gpu")
 
     # List clusters with a filter for a particular application versions, for example list applications above gives "OpenFOAM v1606" ID=12
     clusters = client.catalog.list_clusters(application_id=12)
