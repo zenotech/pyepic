@@ -28,6 +28,14 @@ pyepic.applications.zcfd module
    :undoc-members:
    :show-inheritance:
 
+pyepic.applications.msc_nastran module
+--------------------------------------
+
+.. automodule:: pyepic.applications.msc_nastran
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 
