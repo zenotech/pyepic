@@ -720,3 +720,27 @@ Projects
 
     # Get project ID 102
     project = client.projects.get_details(102)
+
+
+Data
+====
+EPIC uses AWS S3 as an object store for data. The commands in this API use the boto3 library to communicate with the backend S3 services.
+
+Listing a folder
+----------------
+
+.. code-block:: python
+
+    from pyepic import EPICClient
+
+    client = EPICClient("your_api_token_goes_here")
+    
+    directory_listing = client.data.list("epic://Folder/data/")
+    
+    print("Path | Name | Is folder? | File size")
+    for item in directory_listing:
+        print("{} | {} | {} | {}".format(item.obj_path, item.name, item.folder, item.size))
+
+
+Downloading a file
+------------------

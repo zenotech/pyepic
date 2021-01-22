@@ -3,63 +3,60 @@ from enum import Enum
 from .base import JobStep, Job, Upload
 
 
-class Reconstruct (Enum):
-    ALL = 'all'
-    LATEST = 'latest'
-    TIME = 'time'
+class Reconstruct(Enum):
+    ALL = "all"
+    LATEST = "latest"
+    TIME = "time"
 
 
-class StopAt (Enum):
-    END_TIME = 'endTime'
-    WRITE_NOW = 'writeNow'
-    NO_WRITE_NOW = 'noWriteNow'
-    NEXT_WRITE = 'nextWrite'
+class StopAt(Enum):
+    END_TIME = "endTime"
+    WRITE_NOW = "writeNow"
+    NO_WRITE_NOW = "noWriteNow"
+    NEXT_WRITE = "nextWrite"
 
 
-class StartFrom (Enum):
-    FIRST = 'firstTime'
-    START = 'startTime'
-    LATEST = 'latestTime'
+class StartFrom(Enum):
+    FIRST = "firstTime"
+    START = "startTime"
+    LATEST = "latestTime"
 
 
 class BlockMeshStep(JobStep):
-    """ BlockMeshStep step of OpenFOAM
-    """
-
+    """BlockMeshStep step of OpenFOAM"""
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.step_name = 'blockMesh'
+        self.step_name = "blockMesh"
 
 
 class DecomposeParStep(JobStep):
-    """ DecomposeParStep step of OpenFOAM
-    """
+    """DecomposeParStep step of OpenFOAM"""
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.step_name = 'decomposePar'
+        self.step_name = "decomposePar"
 
 
 class SolverStep(JobStep):
-    """ Solver step of OpenFOAM
+    """Solver step of OpenFOAM
 
-            :var run_if_previous_step_fails: Run if previous step fails, defaults to False
-            :vartype run_if_previous_step_fails: bool
-            :var stopAt: When to stop the solver. Defaults to END_TIME
-            :vartype stopAt: :class:`StopAt`
-            :var startFrom: Which timestep to start the solver from. Defaults to LATEST
-            :vartype startFrom: :class:`StartFrom`
-            :var endTime: If stopAt == END_TIME then which timestep to stop the solver at.
-            :vartype endTime: int
-            :var startTime: If startFrom == START then which timestep to start the solver from.
-            :vartype startTime: int
+    :var run_if_previous_step_fails: Run if previous step fails, defaults to False
+    :vartype run_if_previous_step_fails: bool
+    :var stopAt: When to stop the solver. Defaults to END_TIME
+    :vartype stopAt: :class:`StopAt`
+    :var startFrom: Which timestep to start the solver from. Defaults to LATEST
+    :vartype startFrom: :class:`StartFrom`
+    :var endTime: If stopAt == END_TIME then which timestep to stop the solver at.
+    :vartype endTime: int
+    :var startTime: If startFrom == START then which timestep to start the solver from.
+    :vartype startTime: int
     """
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.run_if_previous_step_fails = False
-        self.step_name = 'solver'
+        self.step_name = "solver"
         self.stopAt = StopAt.END_TIME
         self.startFrom = StartFrom.LATEST
         self.endTime = 0
@@ -67,45 +64,46 @@ class SolverStep(JobStep):
 
 
 class ReconstructParStep(JobStep):
-    """ ReconstructPar step of OpenFOAM
+    """ReconstructPar step of OpenFOAM
 
-            :var run_if_previous_step_fails: Run if solver fails, defaults to True
-            :vartype run_if_previous_step_fails: bool
-            :var reconstruct_option: Which time step to reconstruct. Defaults to ALL
-            :vartype reconstruct_option: :class:`Reconstruct`
-            :var reconstruct_time: If reconstruct_option == TIME then which timestep to reconstruct.
-            :vartype reconstruct_time: int
+    :var run_if_previous_step_fails: Run if solver fails, defaults to True
+    :vartype run_if_previous_step_fails: bool
+    :var reconstruct_option: Which time step to reconstruct. Defaults to ALL
+    :vartype reconstruct_option: :class:`Reconstruct`
+    :var reconstruct_time: If reconstruct_option == TIME then which timestep to reconstruct.
+    :vartype reconstruct_time: int
     """
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.run_if_previous_step_fails = True
-        self.step_name = 'reconstructPar'
+        self.step_name = "reconstructPar"
         self.reconstruct_option = Reconstruct.ALL
-        self.reconstruct_time = ''
+        self.reconstruct_time = ""
+
 
 class OpenFoamJob(Job):
     """A helper class for submitting an OpenFOAM job to EPIC.
 
-            :param foam_version_id: The ID of the BatchApplicationVersion of OpenFOAM to use
-            :type foam_version_id: int
-            :param job_name: The name to give the job in EPIC
-            :type job_name: str
-            :param data_path: The epic data path to the OpenFOAM case directory
-            :type data_path: str
+    :param foam_version_id: The ID of the BatchApplicationVersion of OpenFOAM to use
+    :type foam_version_id: int
+    :param job_name: The name to give the job in EPIC
+    :type job_name: str
+    :param data_path: The epic data path to the OpenFOAM case directory
+    :type data_path: str
 
-            :var blockMesh: blockMesh JobStep object
-            :vartype blockMesh: :class:`BlockMeshStep`
-            :var decomposePar: decomposePar JobStep object
-            :vartype decomposePar: :class:`DecomposeParStep`
-            :var solver: initial solver JobStep object
-            :vartype solver: :class:`SolverStep`
-            :var reconstructPar: reconstructPar JobStep object
-            :vartype reconstructPar: :class:`ReconstructParStep`
-            :var clear_partitions: Delete any existing processor directories before running job
-            :type clear_partitions: bool
-            :var sync_processor_directories: Upload processor after job completion, default No
-            :vartype sync_processor_directories: :class:`.base.Upload`
+    :var blockMesh: blockMesh JobStep object
+    :vartype blockMesh: :class:`BlockMeshStep`
+    :var decomposePar: decomposePar JobStep object
+    :vartype decomposePar: :class:`DecomposeParStep`
+    :var solver: initial solver JobStep object
+    :vartype solver: :class:`SolverStep`
+    :var reconstructPar: reconstructPar JobStep object
+    :vartype reconstructPar: :class:`ReconstructParStep`
+    :var clear_partitions: Delete any existing processor directories before running job
+    :type clear_partitions: bool
+    :var sync_processor_directories: Upload processor after job completion, default No
+    :vartype sync_processor_directories: :class:`.base.Upload`
 
     """
 
@@ -124,10 +122,10 @@ class OpenFoamJob(Job):
         self.sync_processor_directories = Upload.NO
 
     def get_applications_options(self):
-        """Get application configuration options for submission to EPIC 
+        """Get application configuration options for submission to EPIC
 
-            :return: Dictionary of the job configuration
-            :rtype: dict
+        :return: Dictionary of the job configuration
+        :rtype: dict
         """
         return {
             "blockMesh": self.blockMesh.execute,
@@ -147,14 +145,13 @@ class OpenFoamJob(Job):
             "reconstruct_time": self.reconstructPar.reconstruct_time,
             "upload_excludes": self.sync_processor_directories.value,
         }
-    
+
     def get_job_create_spec(self, queue_id):
         """Get a JobSpec for this job
 
-            :return: Job Specification
-            :rtype: class:`epiccore.models.JobSpec`
+        :return: Job Specification
+        :rtype: class:`epiccore.models.JobSpec`
         """
         spec = super().get_job_create_spec(queue_id)
         spec.jobs[0].app_options = self.get_applications_options()
         return spec
-

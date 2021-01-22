@@ -1,0 +1,478 @@
+import boto3
+import botocore
+import errno
+import epiccore
+import os
+from pathlib import Path
+from queue import Queue, Empty
+import sys
+import threading
+
+from .base import Client
+
+
+class DataThread(threading.Thread):
+    """
+    Thread class used internally by pyepic for managaing upload/download functions
+    """
+
+    def __init__(
+        self,
+        s3_client,
+        bucket_name,
+        s3_prefix,
+        local_path,
+        file_queue,
+        cancel_event=None,
+        dryrun=False,
+        callback=None,
+        download_thread=True,
+        overwrite_existing=False,
+    ):
+        threading.Thread.__init__(self)
+        self.__s3_client = s3_client
+        self.__bucket_name = bucket_name
+        self.__s3_prefix = s3_prefix
+        self.__file_q = file_queue
+        self.__cancelled = cancel_event
+        self.__local_path = local_path
+        self.__overwrite_existing = overwrite_existing
+        self.__download_thread = download_thread
+        self.__callback = callback
+        self.__dryrun = dryrun
+
+    def __validate_s3_key_as_dir_name(self, s3_key_name):
+        try:
+            for pathname_part in s3_key_name.split("/"):
+                try:
+                    os.lstat("/" + pathname_part)
+                    # If an OS-specific exception is raised, its error code
+                    # indicates whether this pathname is valid or not. Unless this
+                    # is the case, this exception implies an ignorable kernel or
+                    # filesystem complaint (e.g., path not found or inaccessible).
+                    #
+                    # Only the following exceptions indicate invalid pathnames:
+                    #
+                    # * Instances of the Windows-specific "WindowsError" class
+                    #   defining the "winerror" attribute whose value is
+                    #   "ERROR_INVALID_NAME". Under Windows, "winerror" is more
+                    #   fine-grained and hence useful than the generic "errno"
+                    #   attribute. When a too-long pathname is passed, for example,
+                    #   "errno" is "ENOENT" (i.e., no such file or directory) rather
+                    #   than "ENAMETOOLONG" (i.e., file name too long).
+                    # * Instances of the cross-platform "OSError" class defining the
+                    #   generic "errno" attribute whose value is either:
+                    #   * Under most POSIX-compatible OSes, "ENAMETOOLONG".
+                    #   * Under some edge-case OSes (e.g., SunOS, *BSD), "ERANGE".
+                except OSError as exc:
+                    if hasattr(exc, "winerror"):
+                        if exc.winerror == ERROR_INVALID_NAME:
+                            return False
+                    elif exc.errno in {errno.ENAMETOOLONG, errno.ERANGE}:
+                        return False
+        # If a "TypeError" exception was raised, it almost certainly has the
+        # error message "embedded NUL character" indicating an invalid pathname.
+        except TypeError as exc:
+            return False
+        except ValueError as exc:
+            return False
+        else:
+            return True
+
+    def run(self):
+        while not self.__cancelled.is_set():
+            try:
+                item = self.__file_q.get(True, 5)
+                if self.__download_thread:
+                    source_path, target_path, status = self.download_key(item)
+                    source_path = "epic://" + source_path.split("/", 1)[1]
+                else:
+                    source_path, target_path, status = self.upload_file(item)
+                    target_path = "epic://" + target_path.split("/", 1)[1]
+                if self.__callback is not None:
+                    self.__callback(source_path, target_path, status)
+            except Empty:
+                break
+            except Exception as e:
+                raise e
+        return
+
+    def download_key(self, key_name):
+        file_path = os.path.sep.join(key_name.split(self.__s3_prefix)[1].split("/"))
+        full_file_path = os.path.join(self.__local_path, file_path)
+
+        if not self.__validate_s3_key_as_dir_name(key_name):
+            raise ValueError("Invalid key name: %s" % str(key_name))
+
+        if full_file_path.endswith("/"):
+            if not os.path.isdir(full_file_path):
+                os.makedirs(full_file_path)
+            return (key_name, full_file_path, False)
+        if os.path.exists(full_file_path):
+            if not self.__overwrite_existing:
+                return (key_name, full_file_path, False)
+            local_modified = os.path.getmtime(full_file_path)
+            s3_modified = self.__s3_client.head_object(
+                Bucket=self.__bucket_name, Key=key_name
+            )["LastModified"]
+            if s3_modified.timestamp() < local_modified:
+                return (key_name, full_file_path, False)
+            os.remove(full_file_path)
+        file_dir = os.path.dirname(full_file_path)
+        if not os.path.isdir(file_dir):
+            os.makedirs(file_dir)
+        if self.__dryrun:
+            return (key_name, full_file_path, False)
+        else:
+            self.__s3_client.download_file(self.__bucket_name, key_name, full_file_path)
+            return (key_name, full_file_path, True)
+
+    def upload_file(self, file_full_path):
+        last_modified = os.path.getmtime(file_full_path)
+        key_name = file_full_path.split(self.__local_path)[1]
+        s3_key_name = self.__s3_prefix + key_name
+        upload = False
+        try:
+            s3_head = self.__s3_client.head_object(
+                Bucket=self.__bucket_name, Key=s3_key_name
+            )
+            if self.__overwrite_existing:
+                s3_modified = s3_head["LastModified"].timestamp()
+                if last_modified > s3_modified:
+                    upload = True
+        except botocore.exceptions.ClientError as e:
+            if e.response["Error"]["Code"] == "404":
+                upload = True
+            else:
+                raise e
+        if upload and not self.__dryrun:
+            self.__s3_client.upload_file(
+                file_full_path, self.__bucket_name, s3_key_name
+            )
+            return (file_full_path, s3_key_name, True)
+        return (file_full_path, s3_key_name, False)
+
+
+class DataObject(object):
+    """ Class representing a file or folder
+
+    :param name: Name of the file/folder
+    :type name: str
+    :param obj_path: Path of the file/folder
+    :type obj_path: str
+    :param folder: Is the object a folder?
+    :type folder: bool
+    :param name: Size of the object if available
+    :type name: int
+    """
+
+    def __init__(self, name, obj_path, folder=False, size=None):
+        """Constructor method"""
+        self.name = name
+        self.obj_path = obj_path
+        self.folder = folder
+        self.size = size
+
+
+class DataClient(Client):
+    """A wrapper class around the epiccore Data API.
+
+    :param connection_token: Your EPIC API authentication token
+    :type connection_token: str
+    :param connection_url: The API URL for EPIC, defaults to "https://epic.zenotech.com/api/v2"
+    :type connection_url: str, optional
+
+    """
+
+    _s3_prefix = None
+    _s3_bucket = None
+    _s3_client = None
+
+    def _fetch_session_details(self):
+        with epiccore.ApiClient(self.configuration) as api_client:
+            instance = epiccore.DataApi(api_client)
+            return instance.data_session_list()
+
+    def _connect(self):
+        if self._s3_client is None:
+            session_details = self._fetch_session_details()
+            self._s3_prefix = session_details.s3_obj_key
+            self._s3_bucket = session_details.s3_location
+            self._s3_client = boto3.client(
+                "s3",
+                region_name=session_details.aws_region,
+                aws_access_key_id=session_details.session_token.access_key_id,
+                aws_secret_access_key=session_details.session_token.secret_access_key,
+                aws_session_token=session_details.session_token.session_token,
+            )
+
+    def _epic_path_to_s3(self, epic_path):
+        self._connect()
+        if epic_path[:7] != "epic://":
+            raise ValueError("Path specification must start with epic://")
+        raw_path = epic_path[7:]
+        s3_path = "{}{}".format(self._s3_prefix, raw_path)
+        return s3_path
+
+    def _s3_to_epic_path(self, s3_key):
+        self._connect()
+        path = s3_key.split("/", 1)[1]
+        return "epic://{}".format(path)
+
+    def _list_keys(self, s3_prefix, delimeter=""):
+        response = self._s3_client.list_objects_v2(
+            Bucket=self._s3_bucket,
+            Delimiter=delimeter,
+            Prefix=s3_prefix,
+        )
+        if response["IsTruncated"] == True:
+            raise ValueError("More than 1000 objects listed")
+        return response
+
+    def _list_contents(self, s3_prefix, delimeter=""):
+        response = self._list_keys(s3_prefix, delimeter=delimeter)
+        if response["KeyCount"] == 0:
+            raise ValueError("EPIC Path not found")
+        if "Contents" in response:
+            for item in response["Contents"]:
+                yield item["Key"]
+
+    def ls(self, epic_path):
+        """
+        List the files and folders at the given path
+            :param epic_path: Path in the form epic://[<folder>]/
+            :type epic_path: str
+
+            :return: Iterable collection of DataObject
+            :rtype: collections.Iterable[:class:`pyepic.client.data.DataObject`]
+        """
+        self._connect()
+        if not epic_path.endswith("/"):
+            epic_path = epic_path + "/"
+        prefix = self._epic_path_to_s3(epic_path)
+        response = self._list_keys(prefix, delimeter="/")
+        if response["KeyCount"] == 0:
+            raise ValueError("Path not found")
+        if "CommonPrefixes" in response:
+            for item in response["CommonPrefixes"]:
+                folder = DataObject(
+                    item["Prefix"].split("/")[-2],
+                    self._s3_to_epic_path(item["Prefix"]),
+                    folder=True,
+                )
+                yield folder
+        if "Contents" in response:
+            for item in response["Contents"]:
+                file = DataObject(
+                    item["Key"].split("/")[-1],
+                    self._s3_to_epic_path(item["Key"]),
+                    folder=False,
+                    size=item["Size"],
+                )
+                yield file
+
+    def download_file(self, epic_path, destination):
+        """
+        Download the contents of epic_path
+            :param epic_path: Path of a file in the form epic://[<folder>]/<file>
+            :type epic_path: str
+            :param destination: Location to download file to, can be a string or a writable file-like object
+            :type destination: str
+        """
+        self._connect()
+        if epic_path.endswith("/"):
+            raise ValueError("Invalid file epic path")
+        s3_path = self._epic_path_to_s3(epic_path)
+        if type(destination) == str:
+            self._s3_client.download_file(self._s3_bucket, s3_path, destination)
+        else:
+            self._s3_client.download_fileobj(self._s3_bucket, s3_path, destination)
+
+    def upload_file(self, file, epic_path):
+        """
+        Upload the contents of file to epic_path
+            :param destination: Location of the file to upload OR a readable file-like object
+            :type destination: str
+            :param epic_path: Destination path of a file in the form epic://[<folder>]/<file>
+            :type epic_path: str
+        """
+        self._connect()
+        if type(file) == str:
+            if epic_path.endswith("/"):
+                file_name = os.path.basename(file)
+                epic_path += file_name
+            s3_path = self._epic_path_to_s3(epic_path)
+            self._s3_client.upload_file(file, self._s3_bucket, s3_path)
+        else:
+            if epic_path.endswith("/"):
+                raise ValueError("Invalid file epic path")
+            s3_path = self._epic_path_to_s3(epic_path)
+            self._s3_client.upload_fileobj(file, self._s3_bucket, s3_path)
+
+    def delete(self, epic_path):
+        """
+        Delete the file of folder at epic_path
+            :param epic_path: Path of a file or folder to delete in the form epic://[<folder>]/<file>
+            :type epic_path: str
+
+            :return: Was the delete successful, for folder deletions a False returns means one or more delete failures
+            :rtype: bool
+        """
+        self._connect()
+        if not epic_path.endswith("/"):
+            key = self._epic_path_to_s3(epic_path)
+            response = self._s3_client.delete_objects(Bucket=self._s3_bucket, Key=key)
+            if response["DeleteMarker"]:
+                return True
+            return False
+        else:
+            objects = []
+            prefix = self._epic_path_to_s3(epic_path)
+            key_list = self._list_contents(prefix)
+            for item in key_list:
+                objects.append({"Key": item})
+            response = self._s3_client.delete_objects(
+                Bucket=self._s3_bucket,
+                Delete={"Objects": objects},
+            )
+            if "Errors" in response:
+                return False
+            return True
+
+    def sync(
+        self,
+        source_path,
+        target_path,
+        dryrun=False,
+        overwrite_existing=False,
+        callback=None,
+        threads=3,
+        cancel_event=None
+    ):
+        """
+        Synchronize the data from one directory to another, source_path or target_path can be a remote folder or a local folder. 
+            :param source_path: Source folder to syncronise from. For remote folders use form epic://[<folder>]/<file>.
+            :type source_path: str
+            :param target_path: Target folder to syncronise to. For remote folders use form epic://[<folder>]/<file>.
+            :type target_path: str
+            :param dryrun: If dryrun == True then no actual copy will take place but the callback will be called with the generated source and target paths. This can be useful for checking before starting a large upload/download.
+            :type dryrun: bool, optional
+            :param overwrite_existing: If overwrite_existing == True then files with newer modification timestamps in source_path will replace existing files in target_path
+            :type overwrite_existing: bool, optional
+            :param callback: A callback method than accepts three parameters. These are source, destination and then a boolean indicating if a copy has taken place. The callback is called after each file is processed.
+            :type callback: method, optional
+            :param threads: Number of threads to use for sync 
+            :type threads: int, optional
+            :param cancel_event: An instance of threading.Event that can be set to cancel the sync.
+            :type cancel_event: :class:`threading.Event`
+        """
+        if source_path.startswith("epic://"):
+            if target_path.startswith("epic://"):
+                raise ValueError("Both source_path and target_path are EPIC paths")
+            if not source_path.endswith("/"):
+                source_path = source_path + "/"
+            Path(target_path).mkdir(parents=True, exist_ok=True)
+            prefix = self._epic_path_to_s3(source_path)
+            self._download(
+                prefix,
+                target_path,
+                dryrun=dryrun,
+                callback=callback,
+                overwrite_existing=overwrite_existing,
+                cancel_event=cancel_event
+            )
+        elif target_path.startswith("epic://"):
+            if source_path.startswith("epic://"):
+                raise ValueError("Both source_path and target_path are EPIC paths")
+            if not target_path.endswith("/"):
+                target_path = target_path + "/"
+            if not os.path.isdir(source_path):
+                raise ValueError("source_path does not exist")
+            prefix = self._epic_path_to_s3(target_path)
+            self._upload(
+                source_path,
+                prefix,
+                dryrun=dryrun,
+                callback=callback,
+                overwrite_existing=overwrite_existing,
+                cancel_event=cancel_event
+            )
+        else:
+            raise ValueError("At least one epic:// path must be specified")
+
+    def _download(
+        self,
+        s3_prefix,
+        local_destination,
+        dryrun=False,
+        callback=None,
+        threads=3,
+        overwrite_existing=False,
+        cancel_event=None
+    ):
+        file_queue = Queue()
+        if cancel_event is None:
+            cancel_event = threading.Event()
+        thread_pool = []
+        for i in range(threads):
+            t = DataThread(
+                self._s3_client,
+                self._s3_bucket,
+                s3_prefix,
+                local_destination,
+                file_queue,
+                cancel_event=cancel_event,
+                dryrun=dryrun,
+                callback=callback,
+                download_thread=True,
+                overwrite_existing=overwrite_existing,
+            )
+            t.daemon = True
+            t.start()
+            thread_pool.append(t)
+        file_count = 0
+        keys = self._list_contents(s3_prefix)
+        for key in keys:
+            file_count += 1
+            file_queue.put(key)
+        for i in range(threads):
+            thread_pool[i].join()
+
+    def _upload(
+        self,
+        local_source,
+        s3_prefix,
+        threads=1,
+        dryrun=False,
+        callback=None,
+        overwrite_existing=False,
+        cancel_event=None
+    ):
+        file_queue = Queue()
+        if cancel_event is None:
+            cancel_event = threading.Event()
+        thread_pool = []
+        for i in range(threads):
+            t = DataThread(
+                self._s3_client,
+                self._s3_bucket,
+                s3_prefix,
+                local_source,
+                file_queue,
+                cancel_event=cancel_event,
+                dryrun=dryrun,
+                callback=callback,
+                download_thread=False,
+                overwrite_existing=overwrite_existing,
+            )
+            t.daemon = True
+            t.start()
+            thread_pool.append(t)
+        file_count = 0
+        for dirname, _, filenames in os.walk(local_source):
+            for filename in filenames:
+                full_path = os.path.join(dirname, filename)
+                file_count += 1
+                file_queue.put(full_path)
+        for i in range(threads):
+            thread_pool[i].join()

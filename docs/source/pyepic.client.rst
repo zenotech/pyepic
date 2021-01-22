@@ -20,6 +20,14 @@ pyepic.client.catalog module
    :undoc-members:
    :show-inheritance:
 
+pyepic.client.data module
+-------------------------
+
+.. automodule:: pyepic.client.data
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 pyepic.client.desktop module
 ----------------------------
 
