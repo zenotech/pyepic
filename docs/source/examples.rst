@@ -566,6 +566,142 @@ If your data is in your EPIC data store in a folder called 'work/zcfd' then the 
     job = client.job.submit(job_spec)
 
 
+Data
+====
+EPIC uses AWS S3 as an object store for data. The commands in this API use the boto3 library to communicate with the backend S3 services.
+Using PyEpic data in your EPIC data store can be referenced using an EPIC data url. The client class for data functions is :class:`pyepic.client.EPICClient.data`.
+For example if you have a folder in your EPIC data store called "MyData" then the data url would be "epic://MyData/", a file called "data.in" in that folder would be "epic://MyData/data.in".
+
+Listing a folder
+----------------
+List a folder using the ls method.
+
+.. code-block:: python
+
+    from pyepic import EPICClient
+
+    client = EPICClient("your_api_token_goes_here")
+    
+    directory_listing = client.data.ls("epic://Folder/data/")
+    
+    print("Path | Name | Is folder? | File size")
+    for item in directory_listing:
+        print("{} | {} | {} | {}".format(item.obj_path, item.name, item.folder, item.size))
+
+
+Downloading a file
+------------------
+PyEpic lets you download files directly to the local disk or to a File-like object.
+
+To download to a file:
+
+.. code-block:: python
+
+    from pyepic import EPICClient
+
+    client = EPICClient("your_api_token_goes_here")
+    
+    client.data.download_file("epic://MyData/data.in", "./data.in")
+
+
+To download to an in-memory object, for example BytesIO:
+
+.. code-block:: python
+
+    import io
+    from pyepic import EPICClient
+
+    client = EPICClient("your_api_token_goes_here")
+    
+    # Create a new BytesIO object
+    my_data = io.BytesIO()
+
+    # Download contents of epic file into my_data
+    client.data.download_file("epic://MyData/data.in", my_data)
+
+    # Do something with the data in memory
+    my_data.seek(0)
+    my_data.read()
+
+
+Uploading a file
+----------------
+In a similar way to downloading, PyEpic lets you upload from a local file of a file-like object. If you specify a directory as the target then the filename will be taken from the localfile if available.
+
+.. code-block:: python
+
+    from pyepic import EPICClient
+
+    client = EPICClient("your_api_token_goes_here")
+    
+    # Upload data.new to epic://MyData/data.new
+    client.data.upload_file("./data.new", "epic://MyData/")
+
+
+To upload to an in-memory object, for example BytesIO:
+
+.. code-block:: python
+
+    import io
+    from pyepic import EPICClient
+
+    client = EPICClient("your_api_token_goes_here")
+    
+    # Create a new BytesIO object
+    my_data = io.BytesIO("This is new data")
+
+    # Download contents of epic file into my_data
+    client.data.upload_file(my_data, "epic://MyData/data.new")
+
+
+Copying whole folders/directories
+---------------------------------
+
+upload_file and download_file are useful for dealing with single files but often you will need to upload or download whole folders.
+To do this you can use the sync method. This takes a source_path and a target_path than can either be a local path or a remote epic:// url. 
+This means you can either sync from your local files upto EPIC or from EPIC back to your local files.
+
+.. code-block:: python
+
+    from pyepic import EPICClient
+
+    client = EPICClient("your_api_token_goes_here")
+    
+    # Copy everything in my local dir ./data/ to a path on EPIC call new_data. 
+    # If the files already exist in epic://new_data/ then still copy them if the local ones are newer.
+    client.data.sync("./data/", "epic://new_data/", overwrite_existing=True)
+
+
+You can get more information about the copy progress my passing a method in the "callback" kwarg.
+
+.. code-block:: python
+
+    from pyepic import EPICClient
+
+    client = EPICClient("your_api_token_goes_here")
+    
+    def my_callback(source_path, target_path, uploaded):
+        print("Callback. Source={} Target={} Uploaded={}".format(source_path, target_path, uploaded))
+
+    # Copy everything in my local dir ./data/ to a path on EPIC call new_data
+    client.data.sync("./data/", "epic://new_data/", callback=my_callback, overwrite_existing=True)
+
+
+When uploading large datasets then the "dryrun" kwarg lets you see what PyEpic will do without actually performming the copies.
+
+.. code-block:: python
+
+    from pyepic import EPICClient
+
+    client = EPICClient("your_api_token_goes_here")
+    
+    def my_callback(source_path, target_path, uploaded):
+        print("Callback. Source={} Target={} Uploaded={}".format(source_path, target_path, uploaded))
+
+    # Copy everything in my local dir ./data/ to a path on EPIC call new_data
+    client.data.sync("./data/", "epic://new_data/", dryrun=True, callback=my_callback, overwrite_existing=True)
+
+    
 Desktops
 ========
 
@@ -720,27 +856,3 @@ Projects
 
     # Get project ID 102
     project = client.projects.get_details(102)
-
-
-Data
-====
-EPIC uses AWS S3 as an object store for data. The commands in this API use the boto3 library to communicate with the backend S3 services.
-
-Listing a folder
-----------------
-
-.. code-block:: python
-
-    from pyepic import EPICClient
-
-    client = EPICClient("your_api_token_goes_here")
-    
-    directory_listing = client.data.list("epic://Folder/data/")
-    
-    print("Path | Name | Is folder? | File size")
-    for item in directory_listing:
-        print("{} | {} | {} | {}".format(item.obj_path, item.name, item.folder, item.size))
-
-
-Downloading a file
-------------------
