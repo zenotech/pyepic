@@ -1,7 +1,41 @@
+# BSD 3 - Clause License
+
+# Copyright(c) 2020, Zenotech
+# All rights reserved.
+
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+
+# 1. Redistributions of source code must retain the above copyright notice, this
+# list of conditions and the following disclaimer.
+
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+# this list of conditions and the following disclaimer in the documentation
+# and / or other materials provided with the distribution.
+
+# 3. Neither the name of the copyright holder nor the names of its
+# contributors may be used to endorse or promote products derived from
+# this software without specific prior written permission.
+
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+#         SERVICES
+#         LOSS OF USE, DATA, OR PROFITS
+#         OR BUSINESS INTERRUPTION) HOWEVER
+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+# OR TORT(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 import boto3
-import botocore
-import errno
+from botocore.credentials import RefreshableCredentials
+from botocore.exceptions import ClientError
+from botocore.session import get_session
 import epiccore
+import errno
 import os
 from pathlib import Path
 from queue import Queue, Empty
@@ -140,7 +174,7 @@ class DataThread(threading.Thread):
                 s3_modified = s3_head["LastModified"].timestamp()
                 if last_modified > s3_modified:
                     upload = True
-        except botocore.exceptions.ClientError as e:
+        except ClientError as e:
             if e.response["Error"]["Code"] == "404":
                 upload = True
             else:
@@ -154,7 +188,7 @@ class DataThread(threading.Thread):
 
 
 class DataObject(object):
-    """ Class representing a file or folder
+    """Class representing a file or folder
 
     :param name: Name of the file/folder
     :type name: str
@@ -188,23 +222,40 @@ class DataClient(Client):
     _s3_bucket = None
     _s3_client = None
 
-    def _fetch_session_details(self):
+    def _fetch_session_details_from_epic(self):
         with epiccore.ApiClient(self.configuration) as api_client:
             instance = epiccore.DataApi(api_client)
             return instance.data_session_list()
 
+    def _refresh_credentials(self):
+        " Refresh AWS access credentials "
+        session_details = self._fetch_session_details_from_epic()
+        credentials = {
+            "access_key": session_details.session_token.aws_key_id,
+            "secret_key": session_details.session_token.aws_secret_key,
+            "token": session_details.session_token.aws_session_token,
+            "expiry_time": session_details.session_token.expiration.isoformat(),
+            "region": session_details.aws_region,
+            "s3_obj_key": session_details.s3_obj_key,
+            "s3_location": session_details.s3_location,
+        }
+        return credentials
+
     def _connect(self):
         if self._s3_client is None:
-            session_details = self._fetch_session_details()
-            self._s3_prefix = session_details.s3_obj_key
-            self._s3_bucket = session_details.s3_location
-            self._s3_client = boto3.client(
-                "s3",
-                region_name=session_details.aws_region,
-                aws_access_key_id=session_details.session_token.access_key_id,
-                aws_secret_access_key=session_details.session_token.secret_access_key,
-                aws_session_token=session_details.session_token.session_token,
+            session_details = self._refresh_credentials()
+            session_credentials = RefreshableCredentials.create_from_metadata(
+                metadata=session_details,
+                refresh_using=self._refresh_credentials,
+                method="sts-assume-role",
             )
+            session = get_session()
+            session._credentials = session_credentials
+            session.set_config_variable("region", session_details["region"])
+            autorefresh_session = boto3.Session(botocore_session=session)
+            self._s3_client = autorefresh_session.client("s3")
+            self._s3_prefix = session_details["s3_obj_key"]
+            self._s3_bucket = session_details["s3_location"]
 
     def _epic_path_to_s3(self, epic_path):
         self._connect()
@@ -347,10 +398,10 @@ class DataClient(Client):
         overwrite_existing=False,
         callback=None,
         threads=3,
-        cancel_event=None
+        cancel_event=None,
     ):
         """
-        Synchronize the data from one directory to another, source_path or target_path can be a remote folder or a local folder. 
+        Synchronize the data from one directory to another, source_path or target_path can be a remote folder or a local folder.
             :param source_path: Source folder to syncronise from. For remote folders use form epic://[<folder>]/<file>.
             :type source_path: str
             :param target_path: Target folder to syncronise to. For remote folders use form epic://[<folder>]/<file>.
@@ -361,7 +412,7 @@ class DataClient(Client):
             :type overwrite_existing: bool, optional
             :param callback: A callback method than accepts three parameters. These are source, destination and then a boolean indicating if a copy has taken place. The callback is called after each file is processed.
             :type callback: method, optional
-            :param threads: Number of threads to use for sync 
+            :param threads: Number of threads to use for sync
             :type threads: int, optional
             :param cancel_event: An instance of threading.Event that can be set to cancel the sync.
             :type cancel_event: :class:`threading.Event`
@@ -379,7 +430,7 @@ class DataClient(Client):
                 dryrun=dryrun,
                 callback=callback,
                 overwrite_existing=overwrite_existing,
-                cancel_event=cancel_event
+                cancel_event=cancel_event,
             )
         elif target_path.startswith("epic://"):
             if source_path.startswith("epic://"):
@@ -395,7 +446,7 @@ class DataClient(Client):
                 dryrun=dryrun,
                 callback=callback,
                 overwrite_existing=overwrite_existing,
-                cancel_event=cancel_event
+                cancel_event=cancel_event,
             )
         else:
             raise ValueError("At least one epic:// path must be specified")
@@ -408,7 +459,7 @@ class DataClient(Client):
         callback=None,
         threads=3,
         overwrite_existing=False,
-        cancel_event=None
+        cancel_event=None,
     ):
         file_queue = Queue()
         if cancel_event is None:
@@ -446,7 +497,7 @@ class DataClient(Client):
         dryrun=False,
         callback=None,
         overwrite_existing=False,
-        cancel_event=None
+        cancel_event=None,
     ):
         file_queue = Queue()
         if cancel_event is None:
