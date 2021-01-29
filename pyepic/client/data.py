@@ -198,14 +198,17 @@ class DataObject(object):
     :type folder: bool
     :param name: Size of the object if available
     :type name: int
+    :param last_modified: Last modified time if available. Datetime in ISO 8601 format, UTC timezone.
+    :type last_modified: str
     """
 
-    def __init__(self, name, obj_path, folder=False, size=None):
+    def __init__(self, name, obj_path, folder=False, size=None, last_modified=None):
         """Constructor method"""
         self.name = name
         self.obj_path = obj_path
         self.folder = folder
         self.size = size
+        self.last_modified = last_modified
 
 
 class DataClient(Client):
@@ -319,6 +322,7 @@ class DataClient(Client):
                     self._s3_to_epic_path(item["Key"]),
                     folder=False,
                     size=item["Size"],
+                    last_modified=item['LastModified'].isoformat()
                 )
                 yield file
 
@@ -360,35 +364,41 @@ class DataClient(Client):
             s3_path = self._epic_path_to_s3(epic_path)
             self._s3_client.upload_fileobj(file, self._s3_bucket, s3_path)
 
-    def delete(self, epic_path):
+    def delete(self, epic_path, dryrun=False):
         """
         Delete the file of folder at epic_path
             :param epic_path: Path of a file or folder to delete in the form epic://[<folder>]/<file>
             :type epic_path: str
+            :param dryrun: If dryrun is True then return a list of files that would be deleted without actually deleting them
+            :type dryrun: bool
 
-            :return: Was the delete successful, for folder deletions a False returns means one or more delete failures
-            :rtype: bool
+            :return: List of the files deleted
+            :rtype: List[str]
         """
         self._connect()
+        deleted = []
         if not epic_path.endswith("/"):
             key = self._epic_path_to_s3(epic_path)
-            response = self._s3_client.delete_objects(Bucket=self._s3_bucket, Key=key)
-            if response["DeleteMarker"]:
-                return True
-            return False
+            deleted.append(epic_path)
+            if not dryrun:
+                response = self._s3_client.delete_object(Bucket=self._s3_bucket, Key=key)
+            return deleted
         else:
             objects = []
             prefix = self._epic_path_to_s3(epic_path)
             key_list = self._list_contents(prefix)
             for item in key_list:
+                deleted.append(self._s3_to_epic_path(item))
                 objects.append({"Key": item})
-            response = self._s3_client.delete_objects(
-                Bucket=self._s3_bucket,
-                Delete={"Objects": objects},
-            )
-            if "Errors" in response:
-                return False
-            return True
+            if not dryrun:
+                response = self._s3_client.delete_objects(
+                    Bucket=self._s3_bucket,
+                    Delete={"Objects": objects},
+                )
+                if "Errors" in response:
+                    # TODO, remove any error files for deleted list
+                    pass
+            return deleted
 
     def sync(
         self,
@@ -422,6 +432,7 @@ class DataClient(Client):
                 raise ValueError("Both source_path and target_path are EPIC paths")
             if not source_path.endswith("/"):
                 source_path = source_path + "/"
+            target_path = os.path.expanduser(target_path)
             Path(target_path).mkdir(parents=True, exist_ok=True)
             prefix = self._epic_path_to_s3(source_path)
             self._download(
@@ -437,6 +448,7 @@ class DataClient(Client):
                 raise ValueError("Both source_path and target_path are EPIC paths")
             if not target_path.endswith("/"):
                 target_path = target_path + "/"
+            source_path = os.path.expanduser(source_path)
             if not os.path.isdir(source_path):
                 raise ValueError("source_path does not exist")
             prefix = self._epic_path_to_s3(target_path)

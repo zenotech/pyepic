@@ -69,14 +69,15 @@ class JobClient(Client):
             instance = epiccore.JobApi(api_client)
             return instance.job_create(job_array_spec)
 
-    def list(self):
+    def list(self, limit=10):
         """List all of the jobs in EPIC.
 
+        :param limit: Maximum number of jobs to list
+        :type int
         :return: Iterable collection of Jobs
         :rtype: collections.Iterable[:class:`epiccore.models.Job`]
         """
         with epiccore.ApiClient(self.configuration) as api_client:
-            limit = self.LIMIT
             offset = 0
             instance = epiccore.JobApi(api_client)
             results = instance.job_list(limit=limit, offset=offset)

@@ -83,6 +83,21 @@ class CatalogClient(Client):
                 for result in results.results:
                     yield result
 
+    def queue_details(self, queue_id):
+        """Get the details of queue with id queue_id
+
+        :param queue_id: ID of queue to get details for
+        :type queue_id: int
+
+        :return: BatchQueueDetails
+        :rtype: :class:`epiccore.models.BatchQueueDetails`
+        """
+        with epiccore.ApiClient(self.configuration) as api_client:
+            instance = epiccore.CatalogApi(api_client)
+            result = instance.catalog_clusters_read(queue_id
+            )
+            return result
+
     def list_applications(self, product_name=None):
         """List the applications available in EPIC
 
@@ -108,6 +123,20 @@ class CatalogClient(Client):
                 )
                 for result in results.results:
                     yield result
+
+    def application_details(self, application_id):
+        """Get the details of application with id application_id
+
+        :param application_id: ID of application to get details for
+        :type application_id: int
+
+        :return: BatchQueueDetails
+        :rtype: :class:`epiccore.models.BatchApplicationDetails`
+        """
+        with epiccore.ApiClient(self.configuration) as api_client:
+            instance = epiccore.CatalogApi(api_client)
+            result = instance.catalog_applications_read(application_id)
+            return result
 
     def list_desktops(self):
         """List the available Desktops in EPIC
