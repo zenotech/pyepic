@@ -79,15 +79,24 @@ class JobClient(Client):
         """
         with epiccore.ApiClient(self.configuration) as api_client:
             offset = 0
+            count = 0
+            get_batch_size = 20
+            if limit < get_batch_size:
+                get_batch_size = limit
             instance = epiccore.JobApi(api_client)
-            results = instance.job_list(limit=limit, offset=offset)
+            results = instance.job_list(limit=get_batch_size, offset=offset)
             for result in results.results:
+                count += 1
                 yield result
-            while results.next is not None:
-                offset += limit
-                results = instance.job_list(limit=limit, offset=offset)
-                for result in results.results:
-                    yield result
+            if count < limit:
+                while results.next is not None:
+                    offset += limit
+                    results = instance.job_list(limit=get_batch_size, offset=offset)
+                    for result in results.results:
+                        if count >= limit:
+                            return
+                        count += 1
+                        yield result
 
     def list_steps(self, parent_job=None):
         """List all of the job steps in EPIC.

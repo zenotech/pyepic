@@ -76,6 +76,9 @@ class DataThread(threading.Thread):
         self.__dryrun = dryrun
 
     def __validate_s3_key_as_dir_name(self, s3_key_name):
+
+        ERROR_INVALID_NAME = 123
+
         try:
             for pathname_part in s3_key_name.split("/"):
                 try:
@@ -499,7 +502,8 @@ class DataClient(Client):
             file_count += 1
             file_queue.put(key)
         for i in range(threads):
-            thread_pool[i].join()
+            while thread_pool[i].is_alive():
+                thread_pool[i].join(1)
 
     def _upload(
         self,
@@ -538,4 +542,5 @@ class DataClient(Client):
                 file_count += 1
                 file_queue.put(full_path)
         for i in range(threads):
-            thread_pool[i].join()
+            while thread_pool[i].is_alive():
+                thread_pool[i].join(1)
