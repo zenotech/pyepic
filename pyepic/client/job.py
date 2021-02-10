@@ -30,6 +30,7 @@
 # OR TORT(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import time
 import epiccore
 
 from .base import Client
@@ -146,30 +147,31 @@ class JobClient(Client):
             instance = epiccore.JobstepApi(api_client)
             return instance.jobstep_read(step_id)
 
-    def get_step_logs(self, step_id):
+    def get_step_logs(self, step_id, refresh=True, refresh_timeout=10):
         """Get the step logs for step with id step_id
 
         :param step_id: The ID of the step to fetch the logs for
         :type step_id: int
+        :param dryrun: If refresh is True then the request will attempt to refresh the logs before returning the latest update
+        :type dryrun: bool, optional
+        :param dryrun: How many seconds should we wait for a refresh before giving up, default 10 seconds
+        :type dryrun: int, optional
+
         :return: A Job Log instance
         :rtype: class:`epiccore.models.JobLog`
         """
+        if refresh:
+            with epiccore.ApiClient(self.configuration) as api_client:
+                instance = epiccore.JobrefreshApi(api_client)
+                refresh_obj = instance.jobrefresh_create({"job_step":step_id})
+                count = 0 
+                while (count < refresh_timeout) and not refresh_obj.response_recieved:
+                    time.sleep(1)
+                    count += 1
+                    refresh_obj = instance.jobrefresh_create({"job_step": step_id})
         with epiccore.ApiClient(self.configuration) as api_client:
             instance = epiccore.JobstepApi(api_client)
             return instance.jobstep_logs_read(step_id)
-
-    def refresh_step_logs(self, step_id):
-        """Request a refresh for the step logs for step with id step_id
-
-        :param step_id: The ID of the job to fetch the steps for
-        :type step_id: int
-        :return: A Job Log instance
-        :rtype: class:`epiccore.models.JobLog`
-        """
-        with epiccore.ApiClient(self.configuration) as api_client:
-            instance = epiccore.JobstepApi(api_client)
-            data = epiccore.JobLog()
-            return instance.jobstep_logs_update(step_id, data)
 
     def cancel(self, job_id):
         """Cancel job with ID job_id
@@ -180,3 +182,31 @@ class JobClient(Client):
         with epiccore.ApiClient(self.configuration) as api_client:
             instance = epiccore.JobApi(api_client)
             return instance.job_cancel(job_id, {})
+
+    def get_job_residual_names(self, job_id):
+        """Get the names of the residual variables available forjob with id job_id
+
+        :param job_id: The ID of the job to get the residual list for
+        :type job_id: int
+
+        :return: A list of variable names
+        :rtype: List[str]
+        """
+        with epiccore.ApiClient(self.configuration) as api_client:
+            instance = epiccore.JobApi(api_client)
+            return instance.job_residuals_read(job_id, variables=None).variables
+
+    def get_job_residual_values(self, job_id, variable_list):
+        """Get the names of the residual variables available forjob with id job_id
+
+        :param job_id: The ID of the job to get the variables for
+        :type job_id: int
+        :param variable_names: A list of the variables to return
+        :type variable_names: List[str]
+
+        :return: A JobResidualData object
+        :rtype: class:`epiccore.models.JobResidualData`
+        """
+        with epiccore.ApiClient(self.configuration) as api_client:
+            instance = epiccore.JobApi(api_client)
+            return instance.job_residuals_read(job_id, variables=variable_list).residual_values
