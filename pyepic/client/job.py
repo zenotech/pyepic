@@ -162,13 +162,17 @@ class JobClient(Client):
         """
         if refresh:
             with epiccore.ApiClient(self.configuration) as api_client:
-                instance = epiccore.JobrefreshApi(api_client)
-                refresh_obj = instance.jobrefresh_create({"job_step":step_id})
-                count = 0 
-                while (count < refresh_timeout) and not refresh_obj.response_recieved:
-                    time.sleep(1)
-                    count += 1
-                    refresh_obj = instance.jobrefresh_create({"job_step": step_id})
+                try:
+                    instance = epiccore.JobrefreshApi(api_client)
+                    refresh_obj = instance.jobrefresh_create({"job_step":step_id})
+                    count = 0 
+                    while (count < refresh_timeout) and not refresh_obj.response_recieved:
+                        time.sleep(1)
+                        count += 1
+                        refresh_obj = instance.jobrefresh_create({"job_step": step_id})
+                except epiccore.exceptions.ApiException as e:
+                    if e.status != 400:
+                        raise(e)
         with epiccore.ApiClient(self.configuration) as api_client:
             instance = epiccore.JobstepApi(api_client)
             return instance.jobstep_logs_read(step_id)

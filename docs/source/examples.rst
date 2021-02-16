@@ -499,11 +499,41 @@ Job logs are available for each step that makes up the job. The step id's for ea
 
     client = EPICClient("your_api_token_goes_here")
 
-    # Get details for job step id 50
-    jobs = client.job.get_step_logs(50)
+    # Get the latest tail of the log files, EPIC will request an update of the logs for running jobs
+    log_obj = client.job.get_step_logs(50)
 
-    # Request EPIC to refresh the log tails for that step
-    jobs = client.job.refresh_step_logs(50)
+    # Print stdout from the logs
+    print(log_obj.stdout)
+
+    # Get the latest tail of the log files without requesting a refresh
+    log_obj = client.job.refresh_step_logs(50, refresh=False)
+
+
+Fetching job residuals
+----------------------
+
+For applications that support residuals you can fetch the available variable names and then request the data for specific variables.
+
+.. code-block:: python
+
+    from pyepic import EPICClient
+
+    client = EPICClient("your_api_token_goes_here")
+
+    # Get the list of available variables to plot for job id 101
+    available_variables = client.job.get_job_residual_names(101)
+
+    # Print variable names
+    print(available_variables)
+
+    # Get the data for variables "Ux" & "Uy". By default a value of xaxis is always returned.
+    variables = client.job.get_job_residual_values(50, ['Ux','Uy'])
+
+    for var in variables:
+        print("Var name = {}".format(var.variable_name))
+        print("Var values = {}".format(var.values))
+
+
 
 
 Submitting Jobs
