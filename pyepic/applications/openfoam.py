@@ -85,8 +85,8 @@ class ReconstructParStep(JobStep):
 class OpenFoamJob(Job):
     """A helper class for submitting an OpenFOAM job to EPIC.
 
-    :param foam_version_id: The ID of the BatchApplicationVersion of OpenFOAM to use
-    :type foam_version_id: int
+    :param foam_version: The code of the BatchApplicationVersion of OpenFOAM to use
+    :type foam_version: str
     :param job_name: The name to give the job in EPIC
     :type job_name: str
     :param data_path: The epic data path to the OpenFOAM case directory
@@ -107,9 +107,9 @@ class OpenFoamJob(Job):
 
     """
 
-    def __init__(self, foam_version_id, job_name, data_path):
+    def __init__(self, foam_version, job_name, data_path):
 
-        super().__init__(foam_version_id, job_name, data_path)
+        super().__init__(foam_version, job_name, data_path)
         self.blockMesh = BlockMeshStep(execute_step=False)
         self.decomposePar = DecomposeParStep(execute_step=True)
         self.solver = SolverStep(execute_step=True)
@@ -146,12 +146,12 @@ class OpenFoamJob(Job):
             "upload_excludes": self.sync_processor_directories.value,
         }
 
-    def get_job_create_spec(self, queue_id):
+    def get_job_create_spec(self, queue_code):
         """Get a JobSpec for this job
 
         :return: Job Specification
         :rtype: class:`epiccore.models.JobSpec`
         """
-        spec = super().get_job_create_spec(queue_id)
+        spec = super().get_job_create_spec(queue_code)
         spec.jobs[0].app_options = self.get_applications_options()
         return spec

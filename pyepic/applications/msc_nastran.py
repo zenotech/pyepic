@@ -35,8 +35,8 @@ class NastranStep(JobStep):
 class NastranJob(Job):
     """A helper class for submitting an Nastran job to EPIC.
 
-    :param nastran_version_id: The ID of the BatchApplicationVersion of Nastran to use
-    :type nastran_version_id: int
+    :param nastran_version: The code of the BatchApplicationVersion of Nastran to use
+    :type nastran_version: str
     :param job_name: The name to give the job in EPIC
     :type job_name: str
     :param data_path: The epic data path to the Nastran case directory
@@ -52,14 +52,14 @@ class NastranJob(Job):
 
     def __init__(
         self,
-        nastran_version_id,
+        nastran_version,
         job_name,
         data_path,
         dat_file,
         nastran_licence_server,
         partitions=1,
     ):
-        super().__init__(nastran_version_id, job_name, data_path)
+        super().__init__(nastran_version, job_name, data_path)
         self.nastran = NastranStep(
             dat_file, nastran_licence_server, partitions=partitions, execute_step=True
         )
@@ -77,12 +77,12 @@ class NastranJob(Job):
             "stop": False,
         }
 
-    def get_job_create_spec(self, queue_id):
+    def get_job_create_spec(self, queue_code):
         """Get a JobSpec for this job
 
         :return: Job Specification
         :rtype: class:`epiccore.models.JobSpec`
         """
-        spec = super().get_job_create_spec(queue_id)
+        spec = super().get_job_create_spec(queue_code)
         spec.jobs[0].app_options = self.get_applications_options()
         return spec

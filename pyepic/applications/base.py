@@ -110,8 +110,8 @@ class Config(object):
 class Job(object):
     """An EPIC Job Definition
 
-    :param application_version: The ID of the BatchApplicationVersion that this job will user
-    :type application_version: int
+    :param application_version: The Code of the BatchApplicationVersion that this job will user
+    :type application_version: str
     :param job_name: A user friendly name for the job
     :type job_name: str
     :param path: The path to the root of the OpenFOAM job, formed as an epic url (e.g. "epic://path_to/data")
@@ -153,17 +153,17 @@ class Job(object):
             if step.execute:
                 tasks.append(step.get_task_spec())
         jobspec = JobSpec(
-            application_version=self.application_version,
+            app_code=self.application_version,
             project=self.config.project_id,
             tasks=tasks,
         )
         return jobspec
 
-    def get_job_create_spec(self, queue_id):
+    def get_job_create_spec(self, queue_code):
         """Get a JobArraySpec for this job. The JobArraySpec can be used to submit the job to EPIC via the client.
 
-        :param queue_id: The ID of the EPIC batch queue to submit to
-        :type queue_id: int
+        :param queue_code: The code of the EPIC batch queue to submit to
+        :type queue_code: str
 
         :return: Job ArraySpecification
         :rtype: class:`epiccore.models.JobArraySpec`
@@ -177,7 +177,7 @@ class Job(object):
                     spec=self.get_job_spec(),
                     app_options={},
                     cluster=JobClusterSpec(
-                        queue=queue_id,
+                        queue_code=queue_code,
                     ),
                     input_data=DataSpec(
                         path=self.path,

@@ -45,15 +45,15 @@ class CatalogClient(Client):
 
     """
 
-    def list_clusters(self, cluster_name=None, queue_name=None, application_id=None):
+    def list_clusters(self, cluster_name=None, queue_name=None, allowed_apps=None):
         """List the clusters available in EPIC
 
         :param cluster_name: Filter clusters by cluster name.
         :type cluster_name: str, optional
         :param queue_name: Filter clusters by queue name.
         :type queue_name: str, optional
-        :param application_id: Filter clusters by those with application application_id available.
-        :type application_id: int, optional
+        :param allowed_apps: Filter clusters by those with application code available.
+        :type allowed_apps: str, optional
 
         :return: Iterable collection of BatchQueueDetails
         :rtype: collections.Iterable[:class:`epiccore.models.BatchQueueDetails`]
@@ -67,7 +67,7 @@ class CatalogClient(Client):
                 offset=offset,
                 cluster_name=cluster_name,
                 queue_name=queue_name,
-                allowed_apps=application_id,
+                allowed_apps=allowed_apps,
             )
             for result in results.results:
                 yield result

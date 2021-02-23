@@ -35,22 +35,22 @@ To list the available applications you can use the list_applications() method. T
 
     # List all applications
     apps = client.catalog.list_applications()
-    print("ID | Application | Version | Cluster IDs")
+    print("App Code | Application | Version | Cluster Codes")
     for app in apps:
         for version in app.versions:
-            print("{} | {} | {} | {}".format(version.id, app.product.name, version.version, version.queue_ids))
+            print("{} | {} | {} | {}".format(version.app_code, app.product.name, version.version, version.available_on))
 
     # List applications but filter for "foam" in the application name
     foam_apps = client.catalog.list_applications(product_name="foam")
+    
 
 
-An example of the output of list_applications is shown below. The ID listed in the versions dictionary is the application_version_id used when creating a job for that application.
+An example of the output of list_applications is shown below. The App code listed in the versions dictionary is the app_code used when creating a job for that application.
 
 .. code-block:: json
 
     [
-                {'id': 2,
-                'product': {'description': 'The goal of the Extend-Project is to '
+                {'product': {'description': 'The goal of the Extend-Project is to '
                                             'open the FOAM CFD toolbox to '
                                             'community contributed extensions in '
                                             'the spirit of the OpenSource '
@@ -105,11 +105,11 @@ To list queues use the list_clusters() method. You can filter by cluster name or
     # List cluster with a filter for a queue name
     clusters = client.catalog.list_clusters(queue_name="gpu")
 
-    # List clusters with a filter for a particular application versions, for example list applications above gives "OpenFOAM v1606" ID=12
-    clusters = client.catalog.list_clusters(application_id=12)
+    # List clusters with a filter for a particular application versions, filter using the app_codes from the catalog endpoint
+    clusters = client.catalog.list_clusters(allowed_apps="cfx:16.1")
 
 
-An example json response is shown below. The id listed is the batch queue id needed when submitting an EPIC job to that queue.
+An example json response is shown below. The id listed is the queue_code is used when submitting an EPIC job to that queue.
 
 .. code-block:: json
 
@@ -123,7 +123,7 @@ An example json response is shown below. The id listed is the batch queue id nee
                                         '(Broadwell) Xeon CPUs. The GPU nodes '
                                         'each have two Nvidia K80 GPUs.',
                 'display_name': 'CFMS - GPU',
-                'id': 1,
+                'queue_code': 'cfms:gpu',
                 'maintenance_mode': False,
                 'max_allocation': 8,
                 'max_runtime': 72,
@@ -148,7 +148,7 @@ An example json response is shown below. The id listed is the batch queue id nee
                                         '(Broadwell) Xeon CPUs. The High Memory '
                                         'nodes each have 256GB of RAM.',
                 'display_name': 'CFMS - High Memory',
-                'id': 2,
+                'queue_code': 'cfms:highmem',
                 'maintenance_mode': False,
                 'max_allocation': 20,
                 'max_runtime': 72,
@@ -171,7 +171,7 @@ An example json response is shown below. The id listed is the batch queue id nee
                                         'access to more resources but your job '
                                         'may be pre-empted.',
                 'display_name': 'CFMS - Low',
-                'id': 3,
+                'queue_code': 'cfms:low',
                 'maintenance_mode': False,
                 'max_allocation': 120,
                 'max_runtime': 72,
@@ -330,7 +330,7 @@ An example output is shown below.
 
     [
                 {'app': 'OpenFOAM (v1606+)',
-                'application_version': 12,
+                'application_version': "openfoam:v1606+",
                 'config': {'data_sync_interval': 0,
                             'overwrite_existing': True,
                             'upload': ['failure', 'cancel', 'complete']},
@@ -358,7 +358,7 @@ An example output is shown below.
                                                     'the nodes may be reclaimed '
                                                     'if demand rises.',
                             'display_name': 'AWS C5 Spot',
-                            'id': 5,
+                            'queue_code': 'aws:c5',
                             'maintenance_mode': False,
                             'max_allocation': 20,
                             'max_runtime': 36,
@@ -378,7 +378,7 @@ An example output is shown below.
                 'submitted_at': '2020-10-01T09:37:40.674500Z',
                 'submitted_by': 'Mike Turner'},
                 {'app': 'OpenFOAM (v1606+)',
-                'application_version': 12,
+                'application_version': "openfoam:v1606+",
                 'config': {'data_sync_interval': 0,
                             'overwrite_existing': True,
                             'upload': ['failure', 'cancel', 'complete']},
@@ -406,7 +406,7 @@ An example output is shown below.
                                                     'the nodes may be reclaimed '
                                                     'if demand rises.',
                             'display_name': 'AWS C5 Spot',
-                            'id': 5,
+                            'queue_code': 'aws:c5',
                             'maintenance_mode': False,
                             'max_allocation': 20,
                             'max_runtime': 36,
@@ -426,7 +426,7 @@ An example output is shown below.
                 'submitted_at': '2020-10-01T13:33:54.569241Z',
                 'submitted_by': 'Mike Turner'},
                 {'app': 'OpenFOAM (v1606+)',
-                'application_version': 12,
+                'application_version': "openfoam:v1606+",
                 'config': {'data_sync_interval': 0,
                             'overwrite_existing': True,
                             'upload': ['failure', 'cancel', 'complete']},
@@ -454,7 +454,7 @@ An example output is shown below.
                                                     'the nodes may be reclaimed '
                                                     'if demand rises.',
                             'display_name': 'AWS C5 Spot',
-                            'id': 5,
+                            'queue_code': 'aws:c5',
                             'maintenance_mode': False,
                             'max_allocation': 20,
                             'max_runtime': 36,
@@ -544,7 +544,8 @@ Submitting jobs is done with the client.job.submit() method. PyEpic has applicat
 OpenFOAM
 --------
 To create and submit an OpenFOAM job you can use the :class:`pyepic.applications.openfoam.OpenFoamJob` class. 
-Prior to creating the job you need to know the ID over the application version you wish to use, the id of the batch queue you want to submit to and the path to the root of the openfoam case. The data for this case is assumed to have already been uploaded to your EPIC data store.
+Prior to creating the job you need to know the code of the application version you wish to use, the code of the batch queue you want to submit to and the path to the root of the openfoam case. The data for this case is assumed to have already been uploaded to your EPIC data store. 
+The app and queue codes can be obtained from the catalog endpoints.
 
 .. code-block:: python
 
@@ -553,15 +554,15 @@ Prior to creating the job you need to know the ID over the application version y
 
     client = EPICClient("your_api_token_goes_here")
 
-    # Create the job using application version ID 12
-    openfoam_job = OpenFoamJob(12, "job_name", "epic://my_data/foam/")
+    # Create the job using application version with id "openfoam:v1606"
+    openfoam_job = OpenFoamJob("openfoam:v1606", "job_name", "epic://my_data/foam/")
 
     # Configure the solver to run on 24 paritions for a maximum of 12 hours
     openfoam_job.solver.partitions = 24
     openfoam_job.solver.runtime = 12
 
-    # Create the specification for submission to queue ID 3
-    job_spec = openfoam_job.get_job_create_spec(3)
+    # Create the specification for submission to queue with code "aws:c5"
+    job_spec = openfoam_job.get_job_create_spec("aws:c5")
 
     # Submit the job
     job = client.job.submit(job_spec)
@@ -572,9 +573,10 @@ The submit_job method will return a job object. The job_id can be extraced from 
 zCFD
 ----
 To create and submit an zCFD job you can use the :class:`pyepic.applications.zcfd.ZCFDJob` class. 
-Prior to creating the job you need to know the ID of the application version you wish to use, the id of the batch queue you want to 
+Prior to creating the job you need to know the code of the application version you wish to use, the id of the batch queue you want to 
 submit to and the path to the root of the zcfd case. The data for this case is assumed to have already been uploaded to your EPIC data store.
 If your data is in your EPIC data store in a folder called 'work/zcfd' then the data path for the method would be 'epic://work/zcfd/'. 
+The app and queue codes can be obtained from the catalog endpoints.
 
 .. code-block:: python
 
@@ -583,17 +585,22 @@ If your data is in your EPIC data store in a folder called 'work/zcfd' then the 
 
     client = EPICClient("your_api_token_goes_here")
 
-    # Create a zCFD job using application version id 3
-    zcfd_job = ZCFDJob(3, "zcfd_case", "epic://work/zcfd/", "fv.py", "box.hdf5", cycles=1000, restart=False, partitions=24)
+    # Create a zCFD job using application version id "zcfd:2021.1.1"
+    zcfd_job = ZCFDJob("zcfd:2021.1.1", "zcfd_case", "epic://work/zcfd/", "fv.py", "box.hdf5", cycles=1000, restart=False, partitions=24)
 
     # Configure the solver to run for a maximum of 12 hours
     zcfd_job.zcfd.runtime = 12
 
-    # Create the specification for submission to queue ID 3
-    job_spec = zcfd_job.get_job_create_spec(3)
+    # Create the specification for submission to queue "aws:p4d"
+    job_spec = zcfd_job.get_job_create_spec("aws:p4d")
 
     # Submit the job
     job = client.job.submit(job_spec)
+
+    job_id = job[0].id
+
+    print(f"Submitted job with id {id}")
+
 
 
 Data

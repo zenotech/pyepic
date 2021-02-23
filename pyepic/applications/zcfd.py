@@ -37,8 +37,8 @@ class ZCFDStep(JobStep):
 class ZCFDJob(Job):
     """A helper class for submitting an zCFD job to EPIC.
 
-    :param zcfd_version_id: The ID of the BatchApplicationVersion of zCFD to use
-    :type zcfd_version_id: int
+    :param zcfd_version: The code of the BatchApplicationVersion of zCFD to use
+    :type zcfd_version: str
     :param job_name: The name to give the job in EPIC
     :type job_name: str
     :param data_path: The epic data path to the zCFD case directory
@@ -50,7 +50,7 @@ class ZCFDJob(Job):
 
     def __init__(
         self,
-        zcfd_version_id,
+        zcfd_version,
         job_name,
         data_path,
         case_name,
@@ -59,7 +59,7 @@ class ZCFDJob(Job):
         restart=False,
         partitions=1,
     ):
-        super().__init__(zcfd_version_id, job_name, data_path)
+        super().__init__(zcfd_version, job_name, data_path)
         self.zcfd = ZCFDStep(
             case_name,
             problem_name,
@@ -83,12 +83,12 @@ class ZCFDJob(Job):
             "restart": self.zcfd.restart,
         }
 
-    def get_job_create_spec(self, queue_id):
+    def get_job_create_spec(self, queue_code):
         """Get a JobSpec for this job
 
         :return: Job Specification
         :rtype: class:`epiccore.models.JobSpec`
         """
-        spec = super().get_job_create_spec(queue_id)
+        spec = super().get_job_create_spec(queue_code)
         spec.jobs[0].app_options = self.get_applications_options()
         return spec
