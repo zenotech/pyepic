@@ -74,7 +74,7 @@ class JobClient(Client):
         """List all of the jobs in EPIC.
 
         :param limit: Maximum number of jobs to list
-        :type int
+        :type limit: int
         :return: Iterable collection of Jobs
         :rtype: collections.Iterable[:class:`epiccore.models.Job`]
         """
