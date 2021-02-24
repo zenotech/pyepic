@@ -78,7 +78,7 @@ class CatalogClient(Client):
                     offset=offset,
                     cluster_name=cluster_name,
                     queue_name=queue_name,
-                    allowed_apps=application_id,
+                    allowed_apps=allowed_apps,
                 )
                 for result in results.results:
                     yield result
