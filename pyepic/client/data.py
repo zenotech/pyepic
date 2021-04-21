@@ -62,6 +62,7 @@ class DataThread(threading.Thread):
         callback=None,
         download_thread=True,
         overwrite_existing=False,
+        meta_data={}
     ):
         threading.Thread.__init__(self)
         self.__s3_client = s3_client
@@ -74,6 +75,7 @@ class DataThread(threading.Thread):
         self.__download_thread = download_thread
         self.__callback = callback
         self.__dryrun = dryrun
+        self.__meta_data = meta_data
 
     def __validate_s3_key_as_dir_name(self, s3_key_name):
 
@@ -184,7 +186,7 @@ class DataThread(threading.Thread):
                 raise e
         if upload and not self.__dryrun:
             self.__s3_client.upload_file(
-                file_full_path, self.__bucket_name, s3_key_name
+                file_full_path, self.__bucket_name, s3_key_name,  ExtraArgs={'Metadata': self.__meta_data}
             )
             return (file_full_path, s3_key_name, True)
         return (file_full_path, s3_key_name, False)
@@ -228,6 +230,13 @@ class DataClient(Client):
     _s3_bucket = None
     _s3_client = None
 
+    meta_source = "SDK"
+
+    def _fetch_profile_details_from_epic(self):
+        with epiccore.ApiClient(self.configuration) as api_client:
+            instance = epiccore.ProfileApi(api_client)
+            return instance.profile_settings_list()
+
     def _fetch_session_details_from_epic(self):
         with epiccore.ApiClient(self.configuration) as api_client:
             instance = epiccore.DataApi(api_client)
@@ -262,6 +271,8 @@ class DataClient(Client):
             self._s3_client = autorefresh_session.client("s3")
             self._s3_prefix = session_details["s3_obj_key"]
             self._s3_bucket = session_details["s3_location"]
+            profile_details = self._fetch_profile_details_from_epic()
+            self._meta_data = {"Source": self.meta_source, "User-Profile": str( profile_details.id)}
 
     def _epic_path_to_s3(self, epic_path):
         self._connect()
@@ -353,6 +364,8 @@ class DataClient(Client):
             :type destination: str
             :param epic_path: Destination path of a file in the form epic://[<folder>]/<file>
             :type epic_path: str
+            :param epic_path: Destination path of a file in the form epic://[<folder>]/<file>
+            :type epic_path: str
         """
         self._connect()
         if type(file) == str:
@@ -360,12 +373,12 @@ class DataClient(Client):
                 file_name = os.path.basename(file)
                 epic_path += file_name
             s3_path = self._epic_path_to_s3(epic_path)
-            self._s3_client.upload_file(file, self._s3_bucket, s3_path)
+            self._s3_client.upload_file(file, self._s3_bucket, s3_path, ExtraArgs={'Metadata': self._meta_data})
         else:
             if epic_path.endswith("/"):
                 raise ValueError("Invalid file epic path")
             s3_path = self._epic_path_to_s3(epic_path)
-            self._s3_client.upload_fileobj(file, self._s3_bucket, s3_path)
+            self._s3_client.upload_fileobj(file, self._s3_bucket, s3_path, ExtraArgs={'Metadata': self._meta_data})
 
     def delete(self, epic_path, dryrun=False):
         """
@@ -531,6 +544,7 @@ class DataClient(Client):
                 callback=callback,
                 download_thread=False,
                 overwrite_existing=overwrite_existing,
+                meta_data=self._meta_data
             )
             t.daemon = True
             t.start()
