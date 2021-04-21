@@ -364,8 +364,6 @@ class DataClient(Client):
             :type destination: str
             :param epic_path: Destination path of a file in the form epic://[<folder>]/<file>
             :type epic_path: str
-            :param epic_path: Destination path of a file in the form epic://[<folder>]/<file>
-            :type epic_path: str
         """
         self._connect()
         if type(file) == str:
