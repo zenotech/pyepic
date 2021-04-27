@@ -61,6 +61,7 @@ class SolverStep(JobStep):
         self.startFrom = StartFrom.LATEST
         self.endTime = 0
         self.startTime = 0
+        self.application = "simpleFoam"
 
 
 class ReconstructParStep(JobStep):
@@ -141,6 +142,7 @@ class OpenFoamJob(Job):
             "endTime": self.solver.endTime,
             "startTime": self.solver.startTime,
             "startFrom": self.solver.startFrom.value,
+            "solver": self.solver.application,
             "reconstruct_option": self.reconstructPar.reconstruct_option.value,
             "reconstruct_time": self.reconstructPar.reconstruct_time,
             "upload_excludes": self.sync_processor_directories.value,
