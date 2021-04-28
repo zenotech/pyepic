@@ -738,7 +738,33 @@ When uploading large datasets then the "dryrun" kwarg lets you see what PyEpic w
     # Copy everything in my local dir ./data/ to a path on EPIC call new_data
     client.data.sync("./data/", "epic://new_data/", dryrun=True, callback=my_callback, overwrite_existing=True)
 
+
+Deleting files or folders
+-------------------------
+PyEpic lets you delete indivdual files or whole folders from EPIC.
+
+To delete to a single file:
+
+.. code-block:: python
+
+    from pyepic import EPICClient
+
+    client = EPICClient("your_api_token_goes_here")
     
+    client.data.delete("epic://MyData/data.in")
+
+
+To delete a folder and its contents:
+
+.. code-block:: python
+
+    from pyepic import EPICClient
+
+    client = EPICClient("your_api_token_goes_here")
+    
+    client.data.delete("epic://MyData/")
+    
+
 Desktops
 ========
 
