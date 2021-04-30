@@ -169,6 +169,8 @@ class DataThread(threading.Thread):
     def upload_file(self, file_full_path):
         last_modified = os.path.getmtime(file_full_path)
         key_name = file_full_path.split(self.__local_path)[1]
+        if key_name.startswith('/'):
+            key_name = key_name[1:]
         s3_key_name = self.__s3_prefix + key_name
         upload = False
         try:
