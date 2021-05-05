@@ -601,6 +601,53 @@ The app and queue codes can be obtained from the catalog endpoints.
 
     print(f"Submitted job with id {id}")
 
+Job Arrays
+==========
+Job arrays allow you to submit a set of jobs in one submission. Jobs in an array can share common data to reduce the volume of data that you need to transfer. 
+To use arrays you should structure your input data to have a shared root folder. This root folder can then contain the "common" folder and multiple job folders.
+
+The example below shows a job array for zCFD. The example folder structure for this case is:
+
+epic://work/zcfd/
+    The array root folder for the case.
+
+epic://work/zcfd/common/
+    The folder containing files common to all jobs in the array, for example the *box.hdf5* mesh. This must be called "common"
+
+epic://work/zcfd/run.1/
+    The folder with the customised input for the first job, for example the *fv_1.py* python control file. 
+
+epic://work/zcfd/run.2/
+    The folder with the customised input for the second job, for example the *fv_2.py* python control file.
+
+
+.. code-block:: python
+
+    import pyepic
+    from pyepic.applications.zcfd import ZCFDJob
+    from pyepic.applications.base import JobArray
+
+    client = EPICClient("your_api_token_goes_here")
+
+    # Create a new JobArray called my_job_array with epic://work/zcfd/ as the array_root_folder folder
+    job_array = JobArray("my_job_array", "epic://work/zcfd/")
+
+    # Create two zCFD jobs using application version id "zcfd:2021.1.1"
+    zcfd_job_1 = ZCFDJob("zcfd:2021.1.1", "zcfd_run_1", "epic://work/zcfd/run.1/", "fv_1.py", "box.hdf5", cycles=1000, restart=False, partitions=24)
+    zcfd_job_2 = ZCFDJob("zcfd:2021.1.1", "zcfd_run_2", "epic://work/zcfd/run.2/", "fv_2.py", "box.hdf5", cycles=1000, restart=False, partitions=24)
+
+    # Add the jobs to the array
+    job_array.add_job(zcfd_job_1)
+    job_array.add_job(zcfd_job_2)
+
+    # Create the specification for submission to queue "aws:p4d"
+    array_spec = job_array.get_job_create_spec("aws:p4d")
+    
+    # Submit the job array
+    jobs = client.job.submit(array_spec)
+
+    job_1_id = job[0].id
+    job_2_id = job[1].id
 
 
 Data

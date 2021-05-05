@@ -62,7 +62,7 @@ class DataThread(threading.Thread):
         callback=None,
         download_thread=True,
         overwrite_existing=False,
-        meta_data={}
+        meta_data={},
     ):
         threading.Thread.__init__(self)
         self.__s3_client = s3_client
@@ -168,8 +168,8 @@ class DataThread(threading.Thread):
 
     def upload_file(self, file_full_path):
         last_modified = os.path.getmtime(file_full_path)
-        key_name = file_full_path.split(self.__local_path)[1]
-        if key_name.startswith('/'):
+        key_name = os.path.relpath(file_full_path, self.__local_path)
+        if key_name.startswith("/"):
             key_name = key_name[1:]
         s3_key_name = self.__s3_prefix + key_name
         upload = False
@@ -188,7 +188,10 @@ class DataThread(threading.Thread):
                 raise e
         if upload and not self.__dryrun:
             self.__s3_client.upload_file(
-                file_full_path, self.__bucket_name, s3_key_name,  ExtraArgs={'Metadata': self.__meta_data}
+                file_full_path,
+                self.__bucket_name,
+                s3_key_name,
+                ExtraArgs={"Metadata": self.__meta_data},
             )
             return (file_full_path, s3_key_name, True)
         return (file_full_path, s3_key_name, False)
@@ -245,7 +248,7 @@ class DataClient(Client):
             return instance.data_session_list()
 
     def _refresh_credentials(self):
-        " Refresh AWS access credentials "
+        "Refresh AWS access credentials"
         session_details = self._fetch_session_details_from_epic()
         credentials = {
             "access_key": session_details.session_token.aws_key_id,
@@ -274,7 +277,10 @@ class DataClient(Client):
             self._s3_prefix = session_details["s3_obj_key"]
             self._s3_bucket = session_details["s3_location"]
             profile_details = self._fetch_profile_details_from_epic()
-            self._meta_data = {"Source": self.meta_source, "User-Profile": str( profile_details.id)}
+            self._meta_data = {
+                "Source": self.meta_source,
+                "User-Profile": str(profile_details.id),
+            }
 
     def _epic_path_to_s3(self, epic_path):
         self._connect()
@@ -338,7 +344,7 @@ class DataClient(Client):
                     self._s3_to_epic_path(item["Key"]),
                     folder=False,
                     size=item["Size"],
-                    last_modified=item['LastModified'].isoformat()
+                    last_modified=item["LastModified"].isoformat(),
                 )
                 yield file
 
@@ -373,12 +379,16 @@ class DataClient(Client):
                 file_name = os.path.basename(file)
                 epic_path += file_name
             s3_path = self._epic_path_to_s3(epic_path)
-            self._s3_client.upload_file(file, self._s3_bucket, s3_path, ExtraArgs={'Metadata': self._meta_data})
+            self._s3_client.upload_file(
+                file, self._s3_bucket, s3_path, ExtraArgs={"Metadata": self._meta_data}
+            )
         else:
             if epic_path.endswith("/"):
                 raise ValueError("Invalid file epic path")
             s3_path = self._epic_path_to_s3(epic_path)
-            self._s3_client.upload_fileobj(file, self._s3_bucket, s3_path, ExtraArgs={'Metadata': self._meta_data})
+            self._s3_client.upload_fileobj(
+                file, self._s3_bucket, s3_path, ExtraArgs={"Metadata": self._meta_data}
+            )
 
     def delete(self, epic_path, dryrun=False):
         """
@@ -397,7 +407,9 @@ class DataClient(Client):
             key = self._epic_path_to_s3(epic_path)
             deleted.append(epic_path)
             if not dryrun:
-                response = self._s3_client.delete_object(Bucket=self._s3_bucket, Key=key)
+                response = self._s3_client.delete_object(
+                    Bucket=self._s3_bucket, Key=key
+                )
             return deleted
         else:
             objects = []
@@ -544,7 +556,7 @@ class DataClient(Client):
                 callback=callback,
                 download_thread=False,
                 overwrite_existing=overwrite_existing,
-                meta_data=self._meta_data
+                meta_data=self._meta_data,
             )
             t.daemon = True
             t.start()

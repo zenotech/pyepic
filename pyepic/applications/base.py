@@ -186,3 +186,74 @@ class Job(object):
             ],
         )
         return spec
+
+
+class JobArray(object):
+    """A helper class for submitting an array of  jobs to EPIC.
+
+    :param array_name: The name to give the array in EPIC
+    :type array_name: str
+    :param array_root_folder: The epic data path to the root of the array data folder, formed as an epic url (e.g. "epic://path_to/data"). Any data in a folder called "common" within this folder will be shared between all jobs in the array.
+    :type array_root_folder: str
+
+    :var config: The Job configuration options object, common to all jobs in the array
+    :vartype config: :class:`Config`
+    :var jobs: The jobs that make up this array
+    :vartype jobs: list
+    """
+
+    def __init__(
+        self,
+        array_name,
+        array_root_folder,
+    ):
+        self.array_name = array_name
+        self.array_root_folder = array_root_folder
+        self.jobs = []
+        self.config = Config()
+
+    def add_job(self, job):
+        """Add a job to this array
+
+        :param job: The code of the EPIC batch queue to submit to
+        :type job: class:`Job`
+        """
+        if isinstance(job, Job):
+            self.jobs.append(job)
+        else:
+            raise Exception("Can only append Job instances to a JobArray")
+
+    def get_job_create_spec(self, queue_code):
+        """Get a JobArraySpec for this array. The JobArraySpec can be used to submit the array to EPIC via the client.
+
+        :param queue_code: The code of the EPIC batch queue to submit to
+        :type queue_code: str
+
+        :return: Job ArraySpecification
+        :rtype: class:`epiccore.models.JobArraySpec`
+        """
+        job_bindings = []
+        for job in self.jobs:
+            job_bindings.append(
+                JobDataBinding(
+                    name=job.job_name,
+                    spec=job.get_job_spec(),
+                    app_options=job.get_applications_options(),
+                    cluster=JobClusterSpec(
+                        queue_code=queue_code,
+                    ),
+                    input_data=DataSpec(
+                        path=job.path,
+                    ),
+                )
+            )
+
+        spec = JobArraySpec(
+            name=self.array_name,
+            config=self.config.get_configuration(),
+            jobs=job_bindings,
+            common_data=DataSpec(
+                path=self.array_root_folder,
+            ),
+        )
+        return spec

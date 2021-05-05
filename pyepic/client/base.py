@@ -52,7 +52,7 @@ class Client(object):
             host=connection_url,
             api_key={"Bearer": "Bearer {}".format(connection_token)},
         )
-    
+
     def set_limt(self, limit):
         self.LIMIT = limit
 
