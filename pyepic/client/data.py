@@ -129,7 +129,7 @@ class DataThread(threading.Thread):
                     source_path, target_path, status = self.upload_file(item)
                     target_path = "epic://" + target_path.split("/", 1)[1]
                 if self.__callback is not None:
-                    self.__callback(source_path, target_path, status)
+                    self.__callback(source_path, target_path, status, self.__dryrun)
             except Empty:
                 break
             except Exception as e:
@@ -448,7 +448,7 @@ class DataClient(Client):
             :type dryrun: bool, optional
             :param overwrite_existing: If overwrite_existing == True then files with newer modification timestamps in source_path will replace existing files in target_path
             :type overwrite_existing: bool, optional
-            :param callback: A callback method than accepts three parameters. These are source, destination and then a boolean indicating if a copy has taken place. The callback is called after each file is processed.
+            :param callback: A callback method that accepts four parameters. These are source, destination, a boolean indicating if a copy has taken place and a boolean to indicate if the copy was a dryrun. The callback is called after each file is processed.
             :type callback: method, optional
             :param threads: Number of threads to use for sync
             :type threads: int, optional

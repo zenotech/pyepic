@@ -764,8 +764,8 @@ You can get more information about the copy progress my passing a method in the 
 
     client = EPICClient("your_api_token_goes_here")
     
-    def my_callback(source_path, target_path, uploaded):
-        print("Callback. Source={} Target={} Uploaded={}".format(source_path, target_path, uploaded))
+    def my_callback(source_path, target_path, uploaded, dryrun):
+        print("Callback. Source={} Target={} Uploaded={} Dryrun={}".format(source_path, target_path, uploaded, dryrun))
 
     # Copy everything in my local dir ./data/ to a path on EPIC call new_data
     client.data.sync("./data/", "epic://new_data/", callback=my_callback, overwrite_existing=True)
@@ -779,8 +779,8 @@ When uploading large datasets then the "dryrun" kwarg lets you see what PyEpic w
 
     client = EPICClient("your_api_token_goes_here")
     
-    def my_callback(source_path, target_path, uploaded):
-        print("Callback. Source={} Target={} Uploaded={}".format(source_path, target_path, uploaded))
+    def my_callback(source_path, target_path, uploaded, dryrun):
+        print("Callback. Source={} Target={} Uploaded={} Dryrun={}".format(source_path, target_path, uploaded, dryrun))
 
     # Copy everything in my local dir ./data/ to a path on EPIC call new_data
     client.data.sync("./data/", "epic://new_data/", dryrun=True, callback=my_callback, overwrite_existing=True)
