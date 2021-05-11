@@ -10,6 +10,8 @@ class ZCFDStep(JobStep):
     :vartype case_name: str
     :var problem_name: The name of the hdf5 mesh file
     :vartype problem_name: str
+    :var override_file: The name of the zcfd override file for overset meshes
+    :vartype override_file: str
     :var restart: Is the case a restart from a previous solution
     :vartype restart: bool
     :var partitions: How many parallel partitions should the case use
@@ -20,6 +22,7 @@ class ZCFDStep(JobStep):
         self,
         case_name,
         problem_name,
+        override_file,
         cycles,
         restart=False,
         partitions=1,
@@ -29,6 +32,7 @@ class ZCFDStep(JobStep):
         self.step_name = "ZCFD"
         self.case_name = case_name
         self.problem_name = problem_name
+        self.override_file = override_file
         self.restart = restart
         self.partitions = partitions
         self.cycles = cycles
@@ -55,6 +59,7 @@ class ZCFDJob(Job):
         data_path,
         case_name,
         problem_name,
+        override_file=None,
         cycles=100,
         restart=False,
         partitions=1,
@@ -63,6 +68,7 @@ class ZCFDJob(Job):
         self.zcfd = ZCFDStep(
             case_name,
             problem_name,
+            override_file,
             cycles,
             restart=restart,
             partitions=partitions,
@@ -81,6 +87,7 @@ class ZCFDJob(Job):
             "problem_name": self.zcfd.problem_name,
             "cycles": self.zcfd.cycles,
             "restart": self.zcfd.restart,
+            "override_file": self.zcfd.override_file,
         }
 
     def get_job_create_spec(self, queue_code):
