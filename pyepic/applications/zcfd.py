@@ -12,6 +12,8 @@ class ZCFDStep(JobStep):
     :vartype problem_name: str
     :var override_file: The name of the zcfd override file for overset meshes
     :vartype override_file: str
+    :var cycles: How many cycles to run for
+    :vartype cycles: int
     :var restart: Is the case a restart from a previous solution
     :vartype restart: bool
     :var partitions: How many parallel partitions should the case use
@@ -47,6 +49,18 @@ class ZCFDJob(Job):
     :type job_name: str
     :param data_path: The epic data path to the zCFD case directory
     :type data_path: str
+    :param case_name: The name of the python control file for the case
+    :type case_name: str
+    :param problem_name: The name of the hdf5 mesh file
+    :type problem_name: str
+    :param override_file: The name of the zcfd override file for overset meshes. Defaults to None.
+    :type override_file: str, optional
+    :param cycles: How many cycles to run for. Default 100.
+    :type cycles: int, optional
+    :param restart: Is the case a restart from a previous solution. Default False.
+    :type restart: bool, optional
+    :param partitions: How many parallel partitions should the case use. Default 1.
+    :type partitions: int, optional
 
     :var zcfd: zCFD JobStep object
     :vartype zcfd: :class:`ZCFDStep`
