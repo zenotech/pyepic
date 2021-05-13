@@ -1,6 +1,6 @@
 import json
 from enum import Enum
-from .base import JobStep, Job, Upload
+from .base import JobStep, Job, Upload, Distribution
 
 
 class ZCFDStep(JobStep):
@@ -88,6 +88,7 @@ class ZCFDJob(Job):
             partitions=partitions,
             execute_step=True,
         )
+        self.zcfd.task_distribution = Distribution.DEVICE
         self.add_step(self.zcfd)
 
     def get_applications_options(self):
@@ -102,6 +103,8 @@ class ZCFDJob(Job):
             "cycles": self.zcfd.cycles,
             "restart": self.zcfd.restart,
             "override_file": self.zcfd.override_file,
+            "partitions": self.zcfd.partitions,
+            "solver_tasks_per_node": self.zcfd.task_distribution.value,
         }
 
     def get_job_create_spec(self, queue_code):
