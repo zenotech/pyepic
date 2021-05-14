@@ -105,6 +105,7 @@ class ZCFDJob(Job):
             "override_file": self.zcfd.override_file,
             "partitions": self.zcfd.partitions,
             "solver_tasks_per_node": self.zcfd.task_distribution.value,
+            "solver_runtime": self.zcfd.runtime,
         }
 
     def get_job_create_spec(self, queue_code):

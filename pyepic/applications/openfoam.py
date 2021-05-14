@@ -146,6 +146,7 @@ class OpenFoamJob(Job):
             "reconstruct_option": self.reconstructPar.reconstruct_option.value,
             "reconstruct_time": self.reconstructPar.reconstruct_time,
             "upload_excludes": self.sync_processor_directories.value,
+            "solver_tasks_per_node": self.solver.task_distribution,
         }
 
     def get_job_create_spec(self, queue_code):
