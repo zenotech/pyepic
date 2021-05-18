@@ -144,7 +144,7 @@ class DataThread(threading.Thread):
             raise ValueError("Invalid key name: %s" % str(key_name))
 
         if full_file_path.endswith("/"):
-            if not os.path.isdir(full_file_path):
+            if not os.path.isdir(full_file_path) and not self.__dryrun:
                 os.makedirs(full_file_path)
             return (key_name, full_file_path, False)
         if os.path.exists(full_file_path):
@@ -158,7 +158,7 @@ class DataThread(threading.Thread):
                 return (key_name, full_file_path, False)
             os.remove(full_file_path)
         file_dir = os.path.dirname(full_file_path)
-        if not os.path.isdir(file_dir):
+        if not os.path.isdir(file_dir) and not self.__dryrun:
             os.makedirs(file_dir)
         if self.__dryrun:
             return (key_name, full_file_path, False)
@@ -295,23 +295,20 @@ class DataClient(Client):
         path = s3_key.split("/", 1)[1]
         return "epic://{}".format(path)
 
-    def _list_keys(self, s3_prefix, delimeter=""):
-        response = self._s3_client.list_objects_v2(
-            Bucket=self._s3_bucket,
-            Delimiter=delimeter,
-            Prefix=s3_prefix,
+    def _page_keys(self, s3_prefix, delimeter=""):
+        paginator = self._s3_client.get_paginator("list_objects_v2")
+        pages = paginator.paginate(
+            Bucket=self._s3_bucket, Prefix=s3_prefix, Delimiter=delimeter
         )
-        if response["IsTruncated"] == True:
-            raise ValueError("More than 1000 objects listed")
-        return response
+        return pages
 
     def _list_contents(self, s3_prefix, delimeter=""):
-        response = self._list_keys(s3_prefix, delimeter=delimeter)
-        if response["KeyCount"] == 0:
-            raise ValueError("EPIC Path not found")
-        if "Contents" in response:
-            for item in response["Contents"]:
-                yield item["Key"]
+        response_pages = self._page_keys(s3_prefix, delimeter=delimeter)
+        for response in response_pages:
+            if response["KeyCount"] == 0:
+                raise ValueError("EPIC Path not found")
+            for s3_obj in response["Contents"]:
+                yield s3_obj["Key"]
 
     def ls(self, epic_path):
         """
@@ -326,27 +323,28 @@ class DataClient(Client):
         if not epic_path.endswith("/"):
             epic_path = epic_path + "/"
         prefix = self._epic_path_to_s3(epic_path)
-        response = self._list_keys(prefix, delimeter="/")
-        if response["KeyCount"] == 0:
-            raise ValueError("Path not found")
-        if "CommonPrefixes" in response:
-            for item in response["CommonPrefixes"]:
-                folder = DataObject(
-                    item["Prefix"].split("/")[-2],
-                    self._s3_to_epic_path(item["Prefix"]),
-                    folder=True,
-                )
-                yield folder
-        if "Contents" in response:
-            for item in response["Contents"]:
-                file = DataObject(
-                    item["Key"].split("/")[-1],
-                    self._s3_to_epic_path(item["Key"]),
-                    folder=False,
-                    size=item["Size"],
-                    last_modified=item["LastModified"].isoformat(),
-                )
-                yield file
+        response_pages = self._page_keys(prefix, delimeter="/")
+        for response in response_pages:
+            if response["KeyCount"] == 0:
+                raise ValueError("Path not found")
+            if "CommonPrefixes" in response:
+                for item in response["CommonPrefixes"]:
+                    folder = DataObject(
+                        item["Prefix"].split("/")[-2],
+                        self._s3_to_epic_path(item["Prefix"]),
+                        folder=True,
+                    )
+                    yield folder
+            if "Contents" in response:
+                for item in response["Contents"]:
+                    file = DataObject(
+                        item["Key"].split("/")[-1],
+                        self._s3_to_epic_path(item["Key"]),
+                        folder=False,
+                        size=item["Size"],
+                        last_modified=item["LastModified"].isoformat(),
+                    )
+                    yield file
 
     def download_file(self, epic_path, destination):
         """
