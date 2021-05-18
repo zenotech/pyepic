@@ -358,6 +358,11 @@ class DataClient(Client):
         if epic_path.endswith("/"):
             raise ValueError("Invalid file epic path")
         s3_path = self._epic_path_to_s3(epic_path)
+        if destination.endswith(os.path.sep):
+            if not os.path.isdir(destination):
+                os.makedirs(destination)
+        if os.path.isdir(destination):
+            destination = os.path.join(destination, epic_path.split("/")[-1])
         if type(destination) == str:
             self._s3_client.download_file(self._s3_bucket, s3_path, destination)
         else:
