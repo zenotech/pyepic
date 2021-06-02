@@ -732,9 +732,9 @@ To upload to an in-memory object, for example BytesIO:
     client = EPICClient("your_api_token_goes_here")
     
     # Create a new BytesIO object
-    my_data = io.BytesIO("This is new data")
+    my_data = io.BytesIO(b"This is new data")
 
-    # Download contents of epic file into my_data
+    # Upload contents of my_data to epic file 
     client.data.upload_file(my_data, "epic://MyData/data.new")
 
 
