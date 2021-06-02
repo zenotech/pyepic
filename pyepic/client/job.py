@@ -91,7 +91,7 @@ class JobClient(Client):
                 yield result
             if count < limit:
                 while results.next is not None:
-                    offset += limit
+                    offset += get_batch_size
                     results = instance.job_list(limit=get_batch_size, offset=offset)
                     for result in results.results:
                         if count >= limit:
@@ -164,15 +164,17 @@ class JobClient(Client):
             with epiccore.ApiClient(self.configuration) as api_client:
                 try:
                     instance = epiccore.JobrefreshApi(api_client)
-                    refresh_obj = instance.jobrefresh_create({"job_step":step_id})
-                    count = 0 
-                    while (count < refresh_timeout) and not refresh_obj.response_recieved:
+                    refresh_obj = instance.jobrefresh_create({"job_step": step_id})
+                    count = 0
+                    while (
+                        count < refresh_timeout
+                    ) and not refresh_obj.response_recieved:
                         time.sleep(1)
                         count += 1
                         refresh_obj = instance.jobrefresh_create({"job_step": step_id})
                 except epiccore.exceptions.ApiException as e:
                     if e.status != 400:
-                        raise(e)
+                        raise (e)
         with epiccore.ApiClient(self.configuration) as api_client:
             instance = epiccore.JobstepApi(api_client)
             return instance.jobstep_logs_read(step_id)
@@ -213,4 +215,6 @@ class JobClient(Client):
         """
         with epiccore.ApiClient(self.configuration) as api_client:
             instance = epiccore.JobApi(api_client)
-            return instance.job_residuals_read(job_id, variables=variable_list).residual_values
+            return instance.job_residuals_read(
+                job_id, variables=variable_list
+            ).residual_values
