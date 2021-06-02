@@ -92,6 +92,8 @@ class JobClient(Client):
             if count < limit:
                 while results.next is not None:
                     offset += get_batch_size
+                    if offset >= limit:
+                        return
                     results = instance.job_list(limit=get_batch_size, offset=offset)
                     for result in results.results:
                         if count >= limit:
