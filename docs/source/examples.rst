@@ -97,7 +97,7 @@ To list queues use the list_clusters() method. You can filter by cluster name or
     # List all clusters
     clusters = client.catalog.list_clusters()
     for cluster in clusters:
-        print("{} | {} | {}".format(cluster.id, cluster.name, cluster.description))
+        print("{} | {}".format(cluster.name, cluster.description))
 
     # List clusters with a filter for a cluster name
     clusters = client.catalog.list_clusters(cluster_name="csd3")
