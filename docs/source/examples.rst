@@ -205,17 +205,14 @@ To list the types of desktop nodes available in epic use the catalog.list_deskto
     desktops = client.catalog.list_desktops()
 
     # Look at the results
-    print("Name | Version Name | Version ID | Valid Node Types | Valid connection Types")
+    print("Name | Code | Description | CPU Cores | GPUs")
     for desktop in desktops:
-        valid_connections = [conn.id for conn in desktop.connection_types]
-        valid_node_types = [node_type.id for node_type in desktop.node_types]
-        for version in desktop.versions:
-            print("{} | {} | {} | {} | {}".format(
+        print("{} | {} | {} | {} | {}".format(
                 desktop.name,
-                version.application_version,
-                version.id,
-                valid_node_types,
-                valid_connections
+                desktop.node_code,
+                desktop.description,
+                desktop.cores,
+                desktop.gpus
             ))
 
 
@@ -224,81 +221,27 @@ An example json output from list_desktops is shown below
 .. code-block:: json
 
     [
-            {'connection_types': [{'description': 'Connect using Nice DCV in '
-                                            'your browser',
-                                'id': 3,
-                                'name': 'DCV'}],
-            'description': 'NICE Desktop Cloud Visualization (DCV) enables '
-                            'remote access 2D/3D interactive applications '
-                            'over a standard network. EPIC will start a DCV '
-                            'instance that you can connect to with your '
-                            'browser with several versions of Paraview '
-                            'installed and ready to go.',
-            'id': 2,
-            'image': '/media/viz/dcv.png',
-            'name': 'DCV (Paraview)',
-            'node_types': [{'cores': 4,
-                            'description': '4 Broadwell CPU Cores, 30.5GiB '
-                                            'Memory, 1 x Tesla M60 GPU with '
-                                            '2048 CUDA cores and 8GB GPU '
-                                            'Memory',
-                            'gpus': 1,
-                            'id': 1,
-                            'name': 'Standard GPU Node'},
-                            {'cores': 32,
-                            'description': '32 Broadwell CPU Cores, 244GiB '
-                                            'Memory, 2 x Tesla M60 GPU with '
-                                            '2048 CUDA cores and 8GB GPU '
-                                            'Memory',
-                            'gpus': 2,
-                            'id': 2,
-                            'name': 'Large GPU Node'},
-                            {'cores': 64,
-                            'description': '64 Broadwell CPU Cores, 488GiB '
-                                            'Memory, 4 x Tesla M60 GPU with '
-                                            '2048 CUDA cores and 8GB GPU '
-                                            'Memory',
-                            'gpus': 4,
-                            'id': 3,
-                            'name': 'Extra Large GPU Node'}],
-            'versions': [{'application_version': 'DCV 2017', 'id': 4}]},
-            {'connection_types': [{'description': 'Connect using Nice DCV in '
-                                                'your browser',
-                                    'id': 3,
-                                    'name': 'DCV'}],
-            'description': 'zCAD is an CAD repair and mesh generation tool '
-                            'from Zenotech. EPIC will start a DCV instance '
-                            'that you can connect to with your browser with '
-                            'zCAD and other Zenotech tools installed and '
-                            'ready to go.',
-            'id': 3,
-            'image': '/media/viz/zcad.png',
-            'name': 'zCAD',
-            'node_types': [{'cores': 4,
-                            'description': '4 Broadwell CPU Cores, 30.5GiB '
-                                            'Memory, 1 x Tesla M60 GPU with '
-                                            '2048 CUDA cores and 8GB GPU '
-                                            'Memory',
-                            'gpus': 1,
-                            'id': 1,
-                            'name': 'Standard GPU Node'},
-                            {'cores': 32,
-                            'description': '32 Broadwell CPU Cores, 244GiB '
-                                            'Memory, 2 x Tesla M60 GPU with '
-                                            '2048 CUDA cores and 8GB GPU '
-                                            'Memory',
-                            'gpus': 2,
-                            'id': 2,
-                            'name': 'Large GPU Node'},
-                            {'cores': 64,
-                            'description': '64 Broadwell CPU Cores, 488GiB '
-                                            'Memory, 4 x Tesla M60 GPU with '
-                                            '2048 CUDA cores and 8GB GPU '
-                                            'Memory',
-                            'gpus': 4,
-                            'id': 3,
-                            'name': 'Extra Large GPU Node'}],
-            'versions': [{'application_version': '2016.9', 'id': 5}]}
+        {
+        "node_code": "desktop:standard",
+        "name": "Standard GPU Node",
+        "description": "8 Cascade Lake CPU Cores, 32GiB Memory, 1 x NVidia T4 GPU",
+        "cores": 8,
+        "gpus": 1
+        },
+        {
+        "node_code": "desktop:large",
+        "name": "Large GPU Node",
+        "description": "64 Cascade Lake CPU Cores, 256GiB Memory, 1 x NVidia T4 GPU",
+        "cores": 64,
+        "gpus": 1
+        },
+        {
+        "node_code": "desktop:xlarge",
+        "name": "Large (multi-GPU) Node",
+        "description": "48 Cascade Lake CPU Cores, 192GiB Memory, 4 x NVidia T4 GPU",
+        "cores": 64,
+        "gpus": 4
+        }
     ]
 
 Jobs
