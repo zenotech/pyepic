@@ -94,8 +94,7 @@ class CatalogClient(Client):
         """
         with epiccore.ApiClient(self.configuration) as api_client:
             instance = epiccore.CatalogApi(api_client)
-            result = instance.catalog_clusters_read(queue_id
-            )
+            result = instance.catalog_clusters_read(queue_id)
             return result
 
     def list_applications(self, product_name=None):
