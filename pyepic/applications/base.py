@@ -248,12 +248,20 @@ class JobArray(object):
                 )
             )
 
-        spec = JobArraySpec(
-            name=self.array_name,
-            config=self.config.get_configuration(),
-            jobs=job_bindings,
-            common_data=DataSpec(
-                path=self.array_root_folder,
-            ),
-        )
+        if self.array_root_folder:
+            spec = JobArraySpec(
+                name=self.array_name,
+                config=self.config.get_configuration(),
+                jobs=job_bindings,
+                common_data=DataSpec(
+                    path=self.array_root_folder,
+                ),
+            )
+        else:
+            spec = JobArraySpec(
+                name=self.array_name,
+                config=self.config.get_configuration(),
+                jobs=job_bindings,
+                common_data=None,
+            )
         return spec
