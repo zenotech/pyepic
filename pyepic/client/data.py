@@ -145,7 +145,11 @@ class DataThread(threading.Thread):
 
         if full_file_path.endswith("/"):
             if not os.path.isdir(full_file_path) and not self.__dryrun:
-                os.makedirs(full_file_path)
+                try:
+                    os.makedirs(full_file_path)
+                except FileExistsError:
+                    # Directory created on another thread
+                    pass
             return (key_name, full_file_path, False)
         if os.path.exists(full_file_path):
             if not self.__overwrite_existing:
@@ -159,7 +163,11 @@ class DataThread(threading.Thread):
             os.remove(full_file_path)
         file_dir = os.path.dirname(full_file_path)
         if not os.path.isdir(file_dir) and not self.__dryrun:
-            os.makedirs(file_dir)
+            try:
+                os.makedirs(file_dir)
+            except FileExistsError:
+                # Directory created on another thread
+                pass
         if self.__dryrun:
             return (key_name, full_file_path, False)
         else:
