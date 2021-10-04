@@ -894,6 +894,10 @@ Teams
 Projects
 ========
 
+Listing Projects
+----------------
+To list your project codes you can use the projects client.
+
 .. code-block:: python
 
     from pyepic import EPICClient
@@ -909,3 +913,30 @@ Projects
 
     # Get project ID 102
     project = client.projects.get_details(102)
+
+Setting active projects on jobs
+-------------------------------
+You can set the project when submitting a new job by updating the project_id value on your job config object. For example to create a zCFD job with the project id set to 27:
+
+.. code-block:: python
+
+    from pyepic import EPICClient
+    from pyepic.applications.zcfd import ZCFDJob
+
+    client = EPICClient("your_api_token_goes_here")
+
+    # Create a zCFD job using application version id "zcfd:2021.1.1"
+    zcfd_job = ZCFDJob("zcfd:2021.1.1", "zcfd_case", "epic://work/zcfd/", "fv.py", "box.hdf5", cycles=1000, restart=False, partitions=24)
+
+    # Run the job in project with ID 27
+    zcfd_job.config.project_id = 27
+
+    # Create the specification for submission to queue "aws:p4d"
+    job_spec = zcfd_job.get_job_create_spec("aws:p4d")
+
+    # Submit the job
+    job = client.job.submit(job_spec)
+
+    job_id = job[0].id
+
+    print(f"Submitted job with id {id}")
