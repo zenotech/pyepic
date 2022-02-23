@@ -354,6 +354,24 @@ class DataClient(Client):
                     )
                     yield file
 
+    def get_file_meta_data(self, epic_path):
+        """
+        Get the meta-data for the file at epic_path
+            :param epic_path: Path of a file in the form epic://[<folder>]/<file>
+            :type epic_path: str
+
+            :return: Dictionary of file meta-data
+            :rtype: dict
+        """
+        self._connect()
+        if epic_path.endswith("/"):
+            raise ValueError("Invalid file epic path")
+        s3_path = self._epic_path_to_s3(epic_path)
+        # bytes_buffer = io.BytesIO()
+        print(s3_path)
+        head = self._s3_client.head_object(Bucket=self._s3_bucket, Key=s3_path)
+        return head["Metadata"]
+
     def download_file(self, epic_path, destination):
         """
         Download the contents of epic_path
