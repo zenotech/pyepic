@@ -20,7 +20,6 @@ class Distribution(Enum):
     NODE = "node"
     DEVICE = "device"
 
-
 class Upload(Enum):
     """Should excluded files be uploaded? Yes, No or only when the job finishes in an error state."""
 
@@ -56,6 +55,7 @@ class JobStep(object):
         self.execute = execute_step
         self.partitions = 1
         self.task_distribution = Distribution.CORE
+        self.tasks_per_device = 1
         self.runtime = 1
         self.run_if_previous_step_fails = True
         self.hyperthreading = True
@@ -72,6 +72,7 @@ class JobStep(object):
             runtime=self.runtime,
             task_distribution=self.task_distribution.value,
             hyperthreading=self.hyperthreading,
+            tasks_per_device=self.tasks_per_device
         )
         return spec
 

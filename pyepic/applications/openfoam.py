@@ -62,6 +62,7 @@ class SolverStep(JobStep):
         self.endTime = 0
         self.startTime = 0
         self.application = "simpleFoam"
+        self.solver_tasks_per_device = 1
 
 
 class ReconstructParStep(JobStep):
@@ -147,6 +148,7 @@ class OpenFoamJob(Job):
             "reconstruct_time": self.reconstructPar.reconstruct_time,
             "upload_excludes": self.sync_processor_directories.value,
             "solver_tasks_per_node": self.solver.task_distribution.value,
+            "solver_tasks_per_device": self.solver.tasks_per_device
         }
 
     def get_job_create_spec(self, queue_code):
