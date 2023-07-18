@@ -252,7 +252,7 @@ The job client gives access to job related methods.
 Listing Jobs
 --------------
 
-To list jobs use the list_jobs() method. You can filter by cluster name or by available application version id.
+To list jobs use the list_jobs() method. You can filter by Job Array IDs to list all jobs that belong to a given job array.
 
 .. code-block:: python
 
@@ -418,6 +418,21 @@ An example output is shown below.
                 'submitted_by': 'Mike Turner'}
     ]
 
+To get all the jobs that belong to a specific job array.
+
+.. code-block:: python
+
+    from pyepic import EPICClient
+
+    client = EPICClient("your_api_token_goes_here")
+
+    # List jobs that belong to job array ID 100
+    jobs = client.job.list(job_array=100)
+
+    print("ID | Name | Application | Status | Array ID")
+    for job in jobs:
+        print("{} | {} | {} | {} | {}".format(job.id, job.name, job.app, job.status, job.array))
+
 
 To get the details of a specific job with a known ID using the get_job_details method.
 
@@ -429,6 +444,7 @@ To get the details of a specific job with a known ID using the get_job_details m
 
     # Get details for job id 18
     jobs = client.job.get_details(18)
+
 
 
 Checking job logs
