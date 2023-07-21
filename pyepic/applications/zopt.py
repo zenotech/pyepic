@@ -16,11 +16,13 @@ class ExameshStep(JobStep):
         toml_file,
         partitions=1,
         execute_step=True,
+        clean_case=True
     ):
         super().__init__()
         self.step_name = "ExaMesh"
         self.toml_file = toml_file
         self.partitions = partitions
+        self.clean_case = clean_case
 
 class ZCFDStep(JobStep):
     """zCFD Solver
@@ -132,6 +134,7 @@ class ZOPTJob(Job):
             "partitions": self.zcfd.partitions,
             "solver_tasks_per_node": self.zcfd.task_distribution.value,
             "solver_runtime": self.zcfd.runtime,
+            "clean_case": self.examesh.clean_case
         }
 
     def get_job_create_spec(self, queue_code):
