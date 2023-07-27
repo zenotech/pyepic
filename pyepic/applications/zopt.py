@@ -16,7 +16,7 @@ class ExameshStep(JobStep):
         toml_file,
         partitions=1,
         execute_step=True,
-        clean_case=True
+        clean_case=False
     ):
         super().__init__()
         self.step_name = "ExaMesh"
@@ -101,9 +101,10 @@ class ZOPTJob(Job):
         cycles=100,
         restart=False,
         partitions=1,
+        clean_case=False
     ):
         super().__init__(zcfd_version, job_name, data_path)
-        self.examesh = ExameshStep(toml_file, partitions=1)
+        self.examesh = ExameshStep(toml_file, partitions=1, clean_case=clean_case)
         self.add_step(self.examesh)
         self.zcfd = ZCFDStep(
             case_name,
