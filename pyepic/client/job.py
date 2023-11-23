@@ -87,7 +87,10 @@ class JobClient(Client):
             if limit < get_batch_size:
                 get_batch_size = limit
             instance = epiccore.JobApi(api_client)
-            results = instance.job_list(job_array=str(job_array), limit=get_batch_size, offset=offset)
+            if job_array:
+                results = instance.job_list(job_array=str(job_array), limit=get_batch_size, offset=offset)
+            else:
+                results = instance.job_list(limit=get_batch_size, offset=offset)
             for result in results.results:
                 count += 1
                 yield result
